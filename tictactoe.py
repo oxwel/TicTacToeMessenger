@@ -9,16 +9,27 @@ def drawBoard(board, player_id, send_message):
     # "board" is a list of 10 strings representing the board (ignore index 0)
     message = ""
     message += '   |   |'
+    message += '\n'
     message += ' ' + board[7] + ' | ' + board[8] + ' | ' + board[9]
+    message += '\n'
     message += '   |   |'
+    message += '\n'
     message += '-----------'
+    message += '\n'
     message += '   |   |'
+    message += '\n'
     message += ' ' + board[4] + ' | ' + board[5] + ' | ' + board[6]
+    message += '\n'
     message += '   |   |'
+    message += '\n'
     message += '-----------'
+    message += '\n'
     message += '   |   |'
+    message += '\n'
     message += ' ' + board[1] + ' | ' + board[2] + ' | ' + board[3]
+    message += '\n'
     message += '   |   |'
+    message += '\n'
 
     send_message(player_id, message)
 
@@ -167,7 +178,7 @@ def get_next_step(player_id, message, send_message):
             return
         if move < 0 or move > 9:
             send_message(player_id, "Please enter a valid move")
-        elif isSpaceFree(board, move):
+        elif not isSpaceFree(board, move):
             send_message(player_id, "Sorry, this space is occipied. Try another number")
         else:
             makeMove(board, 'X', move)
