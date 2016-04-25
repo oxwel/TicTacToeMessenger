@@ -8,6 +8,7 @@ app.config['SECRET_KEY'] = 'top-secret!'
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
+    print 'called...'
     if request.method == 'GET':
         if request.args.get("hub.verify_token") == os.environ['VERIFY_TOKEN']:
             return request.args.get("hub.challenge")
