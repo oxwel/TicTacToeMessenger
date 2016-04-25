@@ -7,29 +7,12 @@ def drawBoard(board, player_id, send_message):
     # This function prints out the board that it was passed.
 
     # "board" is a list of 10 strings representing the board (ignore index 0)
-    message = ""
-    message += '   |   |'
-    message += '\n'
-    message += ' ' + board[7] + ' | ' + board[8] + ' | ' + board[9]
-    message += '\n'
-    message += '   |   |'
-    message += '\n'
-    message += '-----------'
-    message += '\n'
-    message += '   |   |'
-    message += '\n'
-    message += ' ' + board[4] + ' | ' + board[5] + ' | ' + board[6]
-    message += '\n'
-    message += '   |   |'
-    message += '\n'
-    message += '-----------'
-    message += '\n'
-    message += '   |   |'
-    message += '\n'
-    message += ' ' + board[1] + ' | ' + board[2] + ' | ' + board[3]
-    message += '\n'
-    message += '   |   |'
-    message += '\n'
+    index = 1
+    message = ''
+    while index < 10:
+        message += board[index:index+3]
+        message += '\n'
+        index += 3
 
     send_message(player_id, message)
 
@@ -85,7 +68,7 @@ def getBoardCopy(board):
 
 def isSpaceFree(board, move):
     # Return true if the passed move is free on the passed board.
-    return board[move] == ' '
+    return board[move] == '_'
 
 def getPlayerMove(board):
     # Let the player type in his move.
@@ -168,7 +151,7 @@ def get_next_step(player_id, message, send_message):
     board = get_existing_game(player_id)
     print "board:", board
     if not board:
-        player_sessions[player_id] = [' '] * 10
+        player_sessions[player_id] = ['_'] * 10
         send_rules(player_id, send_message)
     else:
         try:
@@ -183,12 +166,12 @@ def get_next_step(player_id, message, send_message):
         else:
             makeMove(board, 'X', move)
             if isWinner(board, 'X'):
-                drawBoard(board)
+                drawBoard(board, player_id, send_message)
                 send_message(player_id, 'Hooray! You have won the game!')
                 player_sessions.pop(player_id)
                 return
             elif isBoardFull(board):
-                drawBoard(board)
+                drawBoard(board, player_id, send_message)
                 send_message(player_id, 'The game is a tie!')
                 player_sessions.pop(player_id)
                 return
@@ -197,12 +180,12 @@ def get_next_step(player_id, message, send_message):
                 makeMove(board, 'O', move)
 
                 if isWinner(board, 'O'):
-                    drawBoard(board)
+                    drawBoard(board, player_id, send_message)
                     send_message(player_id, 'The computer has beaten you')
                     player_sessions.pop(player_id)
                     return
                 elif isBoardFull(board):
-                    drawBoard(board)
+                    drawBoard(board, player_id, send_message)
                     send_message(player_id, 'The game is a tie!')
                     player_sessions.pop(player_id)
                     return
