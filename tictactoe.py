@@ -10,7 +10,7 @@ def drawBoard(board, player_id, send_message):
     index = 1
     message = ''
     while index < 10:
-        message += ''.join(board[index:index+3])
+        message += ' '.join(board[index:index+3])
         message += '\n'
         index += 3
 
