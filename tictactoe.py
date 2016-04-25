@@ -139,22 +139,28 @@ def isBoardFull(board):
 def get_existing_game(player_id):
     return player_sessions.get(player_id, None)
 
+
 def ask_for_input(player_id, send_message):
     send_message(player_id, "What's your next move?")
 
+
 def send_rules(player_id, send_message):
-    rules = '''
+    rules_part1 = '''
     Two players take turns marking the spaces in a 3×3 grid with X and O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.
     This is a grid where we shall play.
     _ | _ | _
     _ | _ | _
     _ | _ | _
-    Each space has its number:
+    '''
+    send_message(player_id, rules_part1)
+
+    rules_part2 = '''Each space has its number:
     1 | 2 | 3
     4 | 5 | 6
     7 | 8 | 9
+    Just type a number to make your move - and that's it!
     '''
-    send_message(player_id, rules)
+    send_message(player_id, rules_part2)
     pass
 
 
