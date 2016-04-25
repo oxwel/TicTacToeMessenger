@@ -1,3 +1,4 @@
+# coding=utf-8
 # Tic Tac Toe
 
 import random
@@ -142,8 +143,28 @@ def ask_for_input(player_id, send_message):
     send_message(player_id, "What's your next move?")
 
 def send_rules(player_id, send_message):
-    send_message(player_id, "Here come the rules")
+    rules = '''
+    Two players take turns marking the spaces in a 3×3 grid with X and O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.
+    This is a grid where we shall play.
+    _ | _ | _
+    _ | _ | _
+    _ | _ | _
+    Each space has its number:
+    1 | 2 | 3
+    4 | 5 | 6
+    7 | 8 | 9
+    Just type a number to make your move - and that's it!
+    '''
+    send_message(player_id, rules)
     pass
+
+
+def send_rules_option(player_id, send_message):
+    rules_option = '''
+        To know the Rules, type Rules.
+        To start playing type a number between 1-9
+    '''
+    send_message(player_id, rules_option)
 
 
 def get_next_step(player_id, message, send_message):
@@ -152,7 +173,10 @@ def get_next_step(player_id, message, send_message):
     print "board:", board
     if not board:
         player_sessions[player_id] = ['_'] * 10
-        send_rules(player_id, send_message)
+        send_rules_option(player_id, send_message)
+        return
+    elif message.upper() == 'RULES':
+          send_rules(player_id, send_message)
     else:
         try:
             move = int(message)
