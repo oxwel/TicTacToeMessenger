@@ -153,7 +153,6 @@ def send_rules(player_id, send_message):
     1 | 2 | 3
     4 | 5 | 6
     7 | 8 | 9
-    Just type a number to make your move - and that's it!
     '''
     send_message(player_id, rules)
     pass
