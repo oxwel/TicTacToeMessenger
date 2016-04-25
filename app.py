@@ -1,6 +1,7 @@
 from flask import Flask, request
 import os
 import requests
+import tictactoe
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = 'top-secret!'
@@ -19,8 +20,9 @@ def webhook():
                 if x.get('message') and x['message'].get('text'):
                     message = x['message']['text']
                     recipient_id = x['sender']['id']
-                    print message
-                    send_message(recipient_id, message)
+                    print recipient_id,message
+                    tictactoe.get_next_step(recipient_id, message, send_message)
+                    #send_message(recipient_id, message)
                 else:
                     pass
         except Exception, e:
@@ -32,6 +34,7 @@ def send_message(recipient_id, message):
     payload = {'recipient': {'id': recipient_id},
                'message': {'text': message}
                }
+    print payload
     url = 'https://graph.facebook.com/v2.6/me/messages?access_token={}'.format(os.environ['PAGE_ACCESS_TOKEN'])
     result = requests.post(url, json=payload)
     print result.json()
