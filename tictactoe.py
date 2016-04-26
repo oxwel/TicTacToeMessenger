@@ -225,7 +225,7 @@ def get_next_step(player_id, message, send_message):
         send_rules(player_id, send_message)
     else:
         player_first = player_session.get('play_first', True)
-        if player_first:
+        if player_first or not isBoardEmpty(board):
             if not make_player_move(player_id, board, message, send_message):
                 return
             make_computer_move(player_id, board, send_message)
@@ -233,4 +233,4 @@ def get_next_step(player_id, message, send_message):
             if isBoardEmpty(board):
                 make_computer_move(player_id, board, send_message)
 
-    ask_for_input(player_session, send_message)
+    ask_for_input(player_id, send_message)
