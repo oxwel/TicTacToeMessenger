@@ -205,14 +205,18 @@ def get_next_step(player_id, message, send_message):
     print "player_session:", player_session
 
     board = None
+    lang = None
     if player_session:
-        set_lang(player_session.get('lang', None))
+        lang = player_session.get('lang', None)
+        set_lang(lang)
         board = player_session.get('board', None)
     if not player_session or not board or isBoardEmpty(board):
         if message.upper() != 'PLAY':
             return
-        player_sessions[player_id] = {'board': ['_'] * 10}
-        send_language_option(player_id, send_message)
+        if not board:
+            player_sessions[player_id] = {'board': ['_'] * 10}
+        if not lang:
+            send_language_option(player_id, send_message)
         return
     elif message.upper() == 'EN' or message.upper() == 'RU' :
         player_session = get_existing_game(player_id)
@@ -232,6 +236,6 @@ def get_next_step(player_id, message, send_message):
                 return
         else:
             if isBoardEmpty(board) and not make_computer_move(player_id, board, send_message):
-                return 
+                return
 
     ask_for_input(player_id, send_message)
