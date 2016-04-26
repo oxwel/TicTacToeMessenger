@@ -3,6 +3,13 @@
 
 import random
 player_sessions = {}
+import strings_en as message_strings
+
+#When yu have other languages to support. just add a new strings_<language_symbol>.py and impost them
+# Something like if language_choice == 'RU': import strings_ru as message_strings
+#So it's very easy to localize this
+
+
 
 def drawBoard(board, player_id, send_message):
     # This function prints out the board that it was passed.
@@ -17,31 +24,6 @@ def drawBoard(board, player_id, send_message):
 
     send_message(player_id, message)
 
-def inputPlayerLetter():
-    # Lets the player type which letter they want to be.
-    # Returns a list with the player's letter as the first item, and the computer's letter as the second.
-    letter = ''
-    while not (letter == 'X' or letter == 'O'):
-        print('Do you want to be X or O?')
-        letter = input().upper()
-
-    # the first element in the tuple is the player's letter, the second is the computer's letter.
-    if letter == 'X':
-        return ['X', 'O']
-    else:
-        return ['O', 'X']
-
-def whoGoesFirst():
-    # Randomly choose the player who goes first.
-    if random.randint(0, 1) == 0:
-        return 'computer'
-    else:
-        return 'player'
-
-def playAgain():
-    # This function returns True if the player wants to play again, otherwise it returns False.
-    print('Do you want to play again? (yes or no)')
-    return input().lower().startswith('y')
 
 def makeMove(board, letter, move):
     board[move] = letter
@@ -71,13 +53,6 @@ def isSpaceFree(board, move):
     # Return true if the passed move is free on the passed board.
     return board[move] == '_'
 
-def getPlayerMove(board):
-    # Let the player type in his move.
-    move = ' '
-    while move not in '1 2 3 4 5 6 7 8 9'.split() or not isSpaceFree(board, int(move)):
-        print('What is your next move? (1-9)')
-        move = input()
-    return int(move)
 
 def chooseRandomMoveFromList(board, movesList):
     # Returns a valid move from the passed list on the passed board.
@@ -141,35 +116,18 @@ def get_existing_game(player_id):
 
 
 def ask_for_input(player_id, send_message):
-    send_message(player_id, "What's your next move?")
+    send_message(player_id, message_strings.ask_for_input_string)
 
 
 def send_rules(player_id, send_message):
-    rules_part1 = '''
-    Two players take turns marking the spaces in a 3×3 grid with X and O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.
-    This is a grid where we shall play.
-    _ | _ | _
-    _ | _ | _
-    _ | _ | _
-    '''
-    send_message(player_id, rules_part1)
 
-    rules_part2 = '''Each space has its number:
-    1 | 2 | 3
-    4 | 5 | 6
-    7 | 8 | 9
-    Just type a number to make your move - and that's it!
-    '''
-    send_message(player_id, rules_part2)
+    send_message(player_id, message_strings.rules_part1)
+    send_message(player_id, message_strings.rules_part2)
     pass
 
 
 def send_rules_option(player_id, send_message):
-    rules_option = '''
-        To know the Rules, type Rules.
-        To start playing type a number between 1-9
-    '''
-    send_message(player_id, rules_option)
+    send_message(player_id, message_strings.rules_option)
 
 
 def get_next_step(player_id, message, send_message):
@@ -180,28 +138,28 @@ def get_next_step(player_id, message, send_message):
         player_sessions[player_id] = ['_'] * 10
         send_rules_option(player_id, send_message)
         return
-    elif message.upper() == 'RULES':
-          send_rules(player_id, send_message)
+    elif message.upper() == message_strings.rule_string:
+        send_rules(player_id, send_message)
     else:
         try:
             move = int(message)
         except:
-            send_message(player_id, "Please enter a valid move")
+            send_message(player_id, message_strings.valid_move_string)
             return
         if move < 0 or move > 9:
-            send_message(player_id, "Please enter a valid move")
+            send_message(player_id, message_strings.valid_move_string)
         elif not isSpaceFree(board, move):
-            send_message(player_id, "Sorry, this space is occipied. Try another number")
+            send_message(player_id, message_strings.space_occupied)
         else:
             makeMove(board, 'X', move)
             if isWinner(board, 'X'):
                 drawBoard(board, player_id, send_message)
-                send_message(player_id, 'Hooray! You have won the game!')
+                send_message(player_id, message_strings.win_message)
                 player_sessions.pop(player_id)
                 return
             elif isBoardFull(board):
                 drawBoard(board, player_id, send_message)
-                send_message(player_id, 'The game is a tie!')
+                send_message(player_id, message_strings.tie_message)
                 player_sessions.pop(player_id)
                 return
             else:
@@ -210,62 +168,14 @@ def get_next_step(player_id, message, send_message):
 
                 if isWinner(board, 'O'):
                     drawBoard(board, player_id, send_message)
-                    send_message(player_id, 'The computer has beaten you')
+                    send_message(player_id, message_strings.lose_message)
                     player_sessions.pop(player_id)
                     return
                 elif isBoardFull(board):
                     drawBoard(board, player_id, send_message)
-                    send_message(player_id, 'The game is a tie!')
+                    send_message(player_id, message_strings.tie_message)
                     player_sessions.pop(player_id)
                     return
 
         drawBoard(board, player_id, send_message)
     ask_for_input(player_id, send_message)
-
-
-def playGame(palyer):
-    # Reset the board
-    theBoard = [' '] * 10
-    playerLetter, computerLetter = inputPlayerLetter()
-    turn = whoGoesFirst()
-    print('The ' + turn + ' will go first.')
-    gameIsPlaying = True
-
-    while gameIsPlaying:
-        if turn == 'player':
-            # Player's turn.
-            drawBoard(theBoard)
-            move = getPlayerMove(theBoard)
-            makeMove(theBoard, playerLetter, move)
-
-            if isWinner(theBoard, playerLetter):
-                drawBoard(theBoard)
-                print('Hooray! You have won the game!')
-                gameIsPlaying = False
-            else:
-                if isBoardFull(theBoard):
-                    drawBoard(theBoard)
-                    print('The game is a tie!')
-                    break
-                else:
-                    turn = 'computer'
-
-        else:
-            # Computer's turn.
-            move = getComputerMove(theBoard, computerLetter)
-            makeMove(theBoard, computerLetter, move)
-
-            if isWinner(theBoard, computerLetter):
-                drawBoard(theBoard)
-                print('The computer has beaten you! You lose.')
-                gameIsPlaying = False
-            else:
-                if isBoardFull(theBoard):
-                    drawBoard(theBoard)
-                    print('The game is a tie!')
-                    break
-                else:
-                    turn = 'player'
-
-    #if not playAgain():
-        #break

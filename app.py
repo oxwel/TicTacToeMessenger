@@ -23,26 +23,11 @@ def webhook():
                     recipient_id = x['sender']['id']
                     print recipient_id,message
                     tictactoe.get_next_step(recipient_id, message, send_message)
-                    #send_message(recipient_id, message)
                 else:
                     pass
         except Exception, e:
             print e
         return "failure"
-
-# def set_welcome_message():
-#     payload = { "setting_type":"call_to_actions",
-#                 "thread_state":"new_thread",
-#                 "call_to_actions":[
-#                     {
-#                         "message": {
-#                             "text": "Welcome to My Company!"
-#                         }
-#                     }
-#                 ]
-#                 }
-#     url = 'https://graph.facebook.com/v2.6/<PAGE_ID>/thread_settings?access_token='.format(os.environ['PAGE_ACCESS_TOKEN'])
-#     send_to_server(payload,url)
 
 
 def send_to_server(payload, url):
