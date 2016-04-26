@@ -149,7 +149,7 @@ def get_next_step(player_id, message, send_message):
     print "player_session:", player_session
 
     board = None
-    if not player_session:
+    if player_session:
         board = player_session.get('board', None)
     if board and board.get('lang', None):
         set_lang(board.get('lang', None))
