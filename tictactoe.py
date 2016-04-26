@@ -2,13 +2,9 @@
 # Tic Tac Toe
 
 import random
+
 player_sessions = {}
-import strings_en as message_strings
-
-#When yu have other languages to support. just add a new strings_<language_symbol>.py and impost them
-# Something like if language_choice == 'RU': import strings_ru as message_strings
-#So it's very easy to localize this
-
+message_strings = None
 
 
 def drawBoard(board, player_id, send_message):
@@ -130,14 +126,43 @@ def send_rules_option(player_id, send_message):
     send_message(player_id, message_strings.rules_option)
 
 
+def send_language_option(player_id, send_message):
+    language_option = '''
+    If you speak English type EN.
+    If you speak Russian type RU.
+    If you speak Spanish type ES.
+    '''
+    send_message(player_id, language_option)
+
+def set_lang(message):
+    if message.upper() == 'RU':
+        import strings_ru as message_strings_local
+    else:
+        import strings_en as message_strings_local
+    global message_strings
+    message_strings = message_strings_local
+
+
 def get_next_step(player_id, message, send_message):
     player_id = str(player_id)
-    board = get_existing_game(player_id)
-    print "board:", board
-    if not board:
-        player_sessions[player_id] = ['_'] * 10
-        send_rules_option(player_id, send_message)
+    player_session = get_existing_game(player_id)
+    print "board:", player_session
+    board = player_session.get('board' , None)
+    if board and board.get('lang', None):
+        set_lang(board.get('lang', None))
+    if not player_session or not board:
+        if message.upper() != 'PLAY':
+            return
+        player_sessions[player_id] = {'board': ['_'] * 10, 'play_first': True}
+        send_language_option(player_id, send_message)
         return
+    elif message.upper() == 'EN' or message.upper() == 'RU' :
+        player_session = get_existing_game(player_id)
+        if not player_session:
+            return
+        player_session['lang'] = message.upper()
+        set_lang(message)
+        send_rules_option(player_id, send_message)
     elif message.upper() == message_strings.rule_string:
         send_rules(player_id, send_message)
     else:
@@ -146,36 +171,32 @@ def get_next_step(player_id, message, send_message):
         except:
             send_message(player_id, message_strings.valid_move_string)
             return
-        if move < 0 or move > 9:
+        if move < 1 or move > 9:
             send_message(player_id, message_strings.valid_move_string)
         elif not isSpaceFree(board, move):
             send_message(player_id, message_strings.space_occupied)
         else:
             makeMove(board, 'X', move)
+            drawBoard(board, player_id, send_message)
             if isWinner(board, 'X'):
-                drawBoard(board, player_id, send_message)
                 send_message(player_id, message_strings.win_message)
                 player_sessions.pop(player_id)
                 return
             elif isBoardFull(board):
-                drawBoard(board, player_id, send_message)
                 send_message(player_id, message_strings.tie_message)
                 player_sessions.pop(player_id)
                 return
             else:
                 move = getComputerMove(board, 'O')
                 makeMove(board, 'O', move)
-
+                drawBoard(board, player_id, send_message)
                 if isWinner(board, 'O'):
-                    drawBoard(board, player_id, send_message)
                     send_message(player_id, message_strings.lose_message)
                     player_sessions.pop(player_id)
                     return
                 elif isBoardFull(board):
-                    drawBoard(board, player_id, send_message)
                     send_message(player_id, message_strings.tie_message)
                     player_sessions.pop(player_id)
                     return
 
-        drawBoard(board, player_id, send_message)
     ask_for_input(player_id, send_message)
