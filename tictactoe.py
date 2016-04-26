@@ -107,6 +107,14 @@ def isBoardFull(board):
     return True
 
 
+def isBoardEmpty(board):
+    # Return True if every space on the board has been taken. Otherwise return False.
+    for i in range(1, 10):
+        if not isSpaceFree(board, i):
+            return False
+    return True
+
+
 def get_existing_game(player_id):
     return player_sessions.get(player_id, None)
 
@@ -222,8 +230,7 @@ def get_next_step(player_id, message, send_message):
                 return
             make_computer_move(player_id, board, send_message)
         else:
-            if not make_computer_move(player_id, board, send_message):
-                return
-            make_player_move(player_id, board, message, send_message)
+            if isBoardEmpty(board):
+                make_computer_move(player_id, board, send_message)
 
     ask_for_input(player_session, send_message)
