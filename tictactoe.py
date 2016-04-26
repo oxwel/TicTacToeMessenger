@@ -152,7 +152,7 @@ def set_lang(message):
 
 def reset_player(player_id):
     player_session = player_sessions[player_id]
-    player_sessions[player_id] =  {'board': ['_'] * 10,
+    player_sessions[player_id] =  {'board': None,
      'play_first': not player_session.get('play_first', True),
      'lang': player_session.get('lang', 'EN')
      }
@@ -210,11 +210,12 @@ def get_next_step(player_id, message, send_message):
         lang = player_session.get('lang', None)
         set_lang(lang)
         board = player_session.get('board', None)
-    if not player_session or not board or isBoardEmpty(board):
+    if not player_session or not board:
         if message.upper() != 'PLAY':
             return
         if not board:
-            player_sessions[player_id] = {'board': ['_'] * 10}
+            board = ['_'] * 10
+            player_sessions[player_id] = {'board': board}
         if not lang:
             send_language_option(player_id, send_message)
         return
