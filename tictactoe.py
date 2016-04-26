@@ -130,7 +130,6 @@ def send_language_option(player_id, send_message):
     language_option = '''
     If you speak English type EN.
     If you speak Russian type RU.
-    If you speak Spanish type ES.
     '''
     send_message(player_id, language_option)
 
@@ -141,6 +140,55 @@ def set_lang(message):
         import strings_en as message_strings_local
     global message_strings
     message_strings = message_strings_local
+
+
+def reset_player(player_id):
+    player_session = player_sessions[player_id]
+    player_sessions[player_id] =  {'board': ['_'] * 10,
+     'play_first': not player_session.get('play_first', True),
+     'lang': player_session.get('lang', 'EN')
+     }
+
+
+def make_computer_move(player_id, board, send_message):
+    move = getComputerMove(board, 'O')
+    makeMove(board, 'O', move)
+    drawBoard(board, player_id, send_message)
+    if isWinner(board, 'O'):
+        send_message(player_id, message_strings.lose_message)
+        reset_player(player_id)
+        return False
+    elif isBoardFull(board):
+        send_message(player_id, message_strings.tie_message)
+        reset_player(player_id)
+        return False
+    return True
+
+
+def make_player_move(player_id, board, message, send_message):
+    try:
+        move = int(message)
+    except:
+        send_message(player_id, message_strings.valid_move_string)
+        return False
+    if move < 1 or move > 9:
+        send_message(player_id, message_strings.valid_move_string)
+        return False
+    elif not isSpaceFree(board, move):
+        send_message(player_id, message_strings.space_occupied)
+        return False
+    else:
+        makeMove(board, 'X', move)
+        drawBoard(board, player_id, send_message)
+        if isWinner(board, 'X'):
+            send_message(player_id, message_strings.win_message)
+            reset_player(player_id)
+            return False
+        elif isBoardFull(board):
+            send_message(player_id, message_strings.tie_message)
+            reset_player(player_id)
+            return False
+    return True
 
 
 def get_next_step(player_id, message, send_message):
@@ -168,37 +216,14 @@ def get_next_step(player_id, message, send_message):
     elif message.upper() == message_strings.rule_string:
         send_rules(player_id, send_message)
     else:
-        try:
-            move = int(message)
-        except:
-            send_message(player_id, message_strings.valid_move_string)
-            return
-        if move < 1 or move > 9:
-            send_message(player_id, message_strings.valid_move_string)
-        elif not isSpaceFree(board, move):
-            send_message(player_id, message_strings.space_occupied)
+        player_first = player_session.get('play_first', True)
+        if player_first:
+            if not make_player_move(player_id, board, message, send_message):
+                return
+            make_computer_move(player_id, board, send_message)
         else:
-            makeMove(board, 'X', move)
-            drawBoard(board, player_id, send_message)
-            if isWinner(board, 'X'):
-                send_message(player_id, message_strings.win_message)
-                player_sessions.pop(player_id)
+            if not make_computer_move(player_id, board, send_message):
                 return
-            elif isBoardFull(board):
-                send_message(player_id, message_strings.tie_message)
-                player_sessions.pop(player_id)
-                return
-            else:
-                move = getComputerMove(board, 'O')
-                makeMove(board, 'O', move)
-                drawBoard(board, player_id, send_message)
-                if isWinner(board, 'O'):
-                    send_message(player_id, message_strings.lose_message)
-                    player_sessions.pop(player_id)
-                    return
-                elif isBoardFull(board):
-                    send_message(player_id, message_strings.tie_message)
-                    player_sessions.pop(player_id)
-                    return
+            make_player_move(player_id, board, message, send_message)
 
-    ask_for_input(player_id, send_message)
+    ask_for_input(player_session, send_message)
