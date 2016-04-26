@@ -135,7 +135,7 @@ def send_language_option(player_id, send_message):
     send_message(player_id, language_option)
 
 def set_lang(message):
-    if message.upper() == 'RU':
+    if message and message.upper() == 'RU':
         import strings_ru as message_strings_local
     else:
         import strings_en as message_strings_local
@@ -149,8 +149,9 @@ def get_next_step(player_id, message, send_message):
     print "player_session:", player_session
 
     board = None
-    if player_session and player_session.get('lang', None):
-        set_lang(board.get('lang', None))
+    if player_session:
+        set_lang(player_session.get('lang', None))
+        board = player_session.get('board', None)
     if not player_session or not board:
         if message.upper() != 'PLAY':
             return
