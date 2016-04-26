@@ -206,21 +206,28 @@ def get_next_step(player_id, message, send_message):
 
     board = None
     lang = None
+    player_first = True
     if player_session:
         lang = player_session.get('lang', None)
         set_lang(lang)
         board = player_session.get('board', None)
+        player_first = player_session.get('play_first', True)
     if not player_session or not board:
         if message.upper() != 'PLAY':
             return
         if not board:
-            board = ['_'] * 10
+            newBoard = ['_'] * 10
             if not player_session:
                 player_sessions[player_id] = {}
-            player_sessions[player_id]['board'] = board
+            player_sessions[player_id]['board'] = newBoard
+            board = player_sessions[player_id]['board']
+        print "new board = ", board
+        print 'new player_session', player_sessions[player_id]
         if not lang:
             send_language_option(player_id, send_message)
-        return
+            return
+        if not player_first:
+            make_computer_move(player_id, board, send_message)
     elif message.upper() == 'EN' or message.upper() == 'RU' :
         player_session = get_existing_game(player_id)
         if not player_session:
@@ -231,7 +238,7 @@ def get_next_step(player_id, message, send_message):
     elif message.upper() == message_strings.rule_string:
         send_rules(player_id, send_message)
     else:
-        player_first = player_session.get('play_first', True)
+
         if player_first or not isBoardEmpty(board):
             if not make_player_move(player_id, board, message, send_message):
                 return
