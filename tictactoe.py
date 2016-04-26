@@ -215,7 +215,9 @@ def get_next_step(player_id, message, send_message):
             return
         if not board:
             board = ['_'] * 10
-            player_sessions[player_id] = {'board': board}
+            if not player_session:
+                player_sessions[player_id] = {}
+            player_sessions[player_id]['board'] = board
         if not lang:
             send_language_option(player_id, send_message)
         return
