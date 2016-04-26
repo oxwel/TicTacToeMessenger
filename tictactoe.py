@@ -146,8 +146,11 @@ def set_lang(message):
 def get_next_step(player_id, message, send_message):
     player_id = str(player_id)
     player_session = get_existing_game(player_id)
-    print "board:", player_session
-    board = player_session.get('board' , None)
+    print "player_session:", player_session
+
+    board = None
+    if not player_session:
+        board = player_session.get('board', None)
     if board and board.get('lang', None):
         set_lang(board.get('lang', None))
     if not player_session or not board:
