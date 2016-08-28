@@ -1,0 +1,1 @@
+ASK_AGAIN_LIST = ['I do not understand you']

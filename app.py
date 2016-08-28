@@ -1,10 +1,12 @@
 from flask import Flask, request
 import os
 import requests
-import tictactoe
 
 app = Flask(__name__, static_url_path='')
+app.config.from_pyfile('phrases_config.py')
 app.config['SECRET_KEY'] = 'top-secret!'
+
+import tictactoe
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():

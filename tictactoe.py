@@ -3,6 +3,8 @@
 
 import random
 
+from flask import current_app as app
+
 player_sessions = {}
 message_strings = None
 
@@ -141,6 +143,11 @@ def send_language_option(player_id, send_message):
     '''
     send_message(player_id, language_option)
 
+def ask_again(player_id, send_message):
+    msg = random.choice(app.config.ASK_AGAIN_LIST)
+    send_message(player_id, msg)
+
+
 def set_lang(message):
     if message and message.upper() == 'RU':
         import strings_ru as message_strings_local
@@ -214,6 +221,7 @@ def get_next_step(player_id, message, send_message):
         player_first = player_session.get('play_first', True)
     if not player_session or not board:
         if message.upper() != 'PLAY':
+            ask_again(player_id, send_message)
             return
         if not board:
             newBoard = ['_'] * 10
