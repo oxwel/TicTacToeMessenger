@@ -144,7 +144,7 @@ def send_language_option(player_id, send_message):
     send_message(player_id, language_option)
 
 def ask_again(player_id, send_message):
-    msg = random.choice(app.config.ASK_AGAIN_LIST)
+    msg = random.choice(app.config['ASK_AGAIN_LIST'])
     send_message(player_id, msg)
 
 
