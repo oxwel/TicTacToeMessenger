@@ -244,7 +244,7 @@ def get_next_step(player_id, message, send_message):
                 player_sessions[player_id] = {}
                 player_sessions[player_id]['profile'] = get_user_profile(player_id)
                 app.logger.info('New session')
-                app.logger.info(player_session[player_id])
+                app.logger.info(player_sessions[player_id])
             player_sessions[player_id]['board'] = newBoard
             board = player_sessions[player_id]['board']
         print "new board = ", board
