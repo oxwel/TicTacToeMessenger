@@ -1,8 +1,9 @@
 # coding=utf-8
 # Tic Tac Toe
-
+import os
 import random
 
+import requests
 from flask import current_app as app
 
 player_sessions = {}
@@ -16,7 +17,7 @@ def drawBoard(board, player_id, send_message):
     index = 1
     message = ''
     while index < 10:
-        message += ' '.join(board[index:index+3])
+        message += ' '.join(board[index:index + 3])
         message += '\n'
         index += 3
 
@@ -26,17 +27,19 @@ def drawBoard(board, player_id, send_message):
 def makeMove(board, letter, move):
     board[move] = letter
 
+
 def isWinner(bo, le):
     # Given a board and a player's letter, this function returns True if that player has won.
     # We use bo instead of board and le instead of letter so we don't have to type as much.
-    return ((bo[7] == le and bo[8] == le and bo[9] == le) or # across the top
-    (bo[4] == le and bo[5] == le and bo[6] == le) or # across the middle
-    (bo[1] == le and bo[2] == le and bo[3] == le) or # across the bottom
-    (bo[7] == le and bo[4] == le and bo[1] == le) or # down the left side
-    (bo[8] == le and bo[5] == le and bo[2] == le) or # down the middle
-    (bo[9] == le and bo[6] == le and bo[3] == le) or # down the right side
-    (bo[7] == le and bo[5] == le and bo[3] == le) or # diagonal
-    (bo[9] == le and bo[5] == le and bo[1] == le)) # diagonal
+    return ((bo[7] == le and bo[8] == le and bo[9] == le) or  # across the top
+            (bo[4] == le and bo[5] == le and bo[6] == le) or  # across the middle
+            (bo[1] == le and bo[2] == le and bo[3] == le) or  # across the bottom
+            (bo[7] == le and bo[4] == le and bo[1] == le) or  # down the left side
+            (bo[8] == le and bo[5] == le and bo[2] == le) or  # down the middle
+            (bo[9] == le and bo[6] == le and bo[3] == le) or  # down the right side
+            (bo[7] == le and bo[5] == le and bo[3] == le) or  # diagonal
+            (bo[9] == le and bo[5] == le and bo[1] == le))  # diagonal
+
 
 def getBoardCopy(board):
     # Make a duplicate of the board list and return it the duplicate.
@@ -46,6 +49,7 @@ def getBoardCopy(board):
         dupeBoard.append(i)
 
     return dupeBoard
+
 
 def isSpaceFree(board, move):
     # Return true if the passed move is free on the passed board.
@@ -64,6 +68,7 @@ def chooseRandomMoveFromList(board, movesList):
         return random.choice(possibleMoves)
     else:
         return None
+
 
 def getComputerMove(board, computerLetter):
     # Given a board and the computer's letter, determine where to move and return that move.
@@ -101,6 +106,7 @@ def getComputerMove(board, computerLetter):
     # Move on one of the sides.
     return chooseRandomMoveFromList(board, [2, 4, 6, 8])
 
+
 def isBoardFull(board):
     # Return True if every space on the board has been taken. Otherwise return False.
     for i in range(1, 10):
@@ -126,7 +132,6 @@ def ask_for_input(player_id, send_message):
 
 
 def send_rules(player_id, send_message):
-
     send_message(player_id, message_strings.rules_part1)
     send_message(player_id, message_strings.rules_part2)
     pass
@@ -142,6 +147,7 @@ def send_language_option(player_id, send_message):
     If you speak Russian type RU.
     '''
     send_message(player_id, language_option)
+
 
 def ask_again(player_id, send_message):
     msg = random.choice(app.config['ASK_AGAIN_LIST'])
@@ -159,10 +165,10 @@ def set_lang(message):
 
 def reset_player(player_id):
     player_session = player_sessions[player_id]
-    player_sessions[player_id] =  {'board': None,
-     'play_first': not player_session.get('play_first', True),
-     'lang': player_session.get('lang', 'EN')
-     }
+    player_sessions[player_id] = {'board': None,
+                                  'play_first': not player_session.get('play_first', True),
+                                  'lang': player_session.get('lang', 'EN')
+                                  }
 
 
 def make_computer_move(player_id, board, send_message):
@@ -206,6 +212,14 @@ def make_player_move(player_id, board, message, send_message):
     return True
 
 
+def get_user_profile(player_id):
+    payload = {'fields': 'first_name,locale',
+               'access_token': os.environ['PAGE_ACCESS_TOKEN']}
+    url = "https://graph.facebook.com/v2.6/{user_id:s}".format(user_id=player_id)
+    resp = requests.post(url, params=payload)
+    return resp.json()
+
+
 def get_next_step(player_id, message, send_message):
     player_id = str(player_id)
     player_session = get_existing_game(player_id)
@@ -228,6 +242,8 @@ def get_next_step(player_id, message, send_message):
             if not player_session:
                 player_sessions[player_id] = {}
             player_sessions[player_id]['board'] = newBoard
+            player_sessions[player_id]['profile'] = get_user_profile(player_id)
+            app.logger.info(player_session[player_id])
             board = player_sessions[player_id]['board']
         print "new board = ", board
         print 'new player_session', player_sessions[player_id]
@@ -236,7 +252,7 @@ def get_next_step(player_id, message, send_message):
             return
         if not player_first:
             make_computer_move(player_id, board, send_message)
-    elif message.upper() == 'EN' or message.upper() == 'RU' :
+    elif message.upper() == 'EN' or message.upper() == 'RU':
         player_session = get_existing_game(player_id)
         if not player_session:
             ask_again(player_id, send_message)
