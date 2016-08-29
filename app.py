@@ -6,6 +6,7 @@ import os
 import requests
 
 app = Flask(__name__, static_url_path='')
+app.config.from_pyfile('config.py')
 app.config.from_pyfile('phrases_config.py')
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['LOGFILE'] = 'application.log'

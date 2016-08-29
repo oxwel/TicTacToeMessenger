@@ -223,7 +223,7 @@ def get_user_profile(player_id):
 def get_next_step(player_id, message, send_message):
     player_id = str(player_id)
     player_session = get_existing_game(player_id)
-    app.logger.info("player_session:", player_session)
+    app.logger.info(player_session)
 
     board = None
     lang = None
