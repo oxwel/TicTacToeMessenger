@@ -155,7 +155,7 @@ def ask_again(player_id, send_message):
 
 
 def set_lang(message):
-    if message and message.upper() == 'RU':
+    if message and 'RU' in message.upper():
         import strings_ru as message_strings_local
     else:
         import strings_en as message_strings_local
@@ -250,8 +250,13 @@ def get_next_step(player_id, message, send_message):
         print "new board = ", board
         print 'new player_session', player_sessions[player_id]
         if not lang:
-            send_language_option(player_id, send_message)
-            return
+            if not player_sessions[player_id]['profile']['locale']:
+                send_language_option(player_id, send_message)
+                return
+            else:
+                player_session['lang'] = player_sessions[player_id]['profile']['locale']
+                set_lang(player_session['lang'])
+                send_rules_option(player_id, send_message)
         if not player_first:
             make_computer_move(player_id, board, send_message)
     elif message.upper() == 'EN' or message.upper() == 'RU':
