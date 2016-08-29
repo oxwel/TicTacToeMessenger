@@ -15,7 +15,7 @@ file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(messag
 app.logger.setLevel(logging.INFO)
 file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
-app.logger.info('Application startup')
+app.logger.info('Application startup\nVersion: {}'.format(app.config['VERSION']))
 
 import tictactoe
 
