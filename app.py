@@ -1,6 +1,8 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
+import sys
+
 from flask import Flask, request, send_from_directory
 import os
 import requests
@@ -11,11 +13,14 @@ app.config.from_pyfile('phrases_config.py')
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['LOGFILE'] = 'application.log'
 
-file_handler = RotatingFileHandler(app.config['LOGFILE'], 'w', 1 * 1024 * 1024, 10)
-file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+# file_handler = RotatingFileHandler(app.config['LOGFILE'], 'w', 1 * 1024 * 1024, 10)
+# file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
 app.logger.setLevel(logging.INFO)
-file_handler.setLevel(logging.INFO)
-app.logger.addHandler(file_handler)
+# file_handler.setLevel(logging.INFO)
+stdout_handler.setLevel(logging.INFO)
+app.logger.addHandler(stdout_handler)
 app.logger.info('Application startup\nVersion: {}'.format(app.config['VERSION']))
 
 import tictactoe
