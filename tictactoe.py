@@ -216,7 +216,7 @@ def get_user_profile(player_id):
     payload = {'fields': 'first_name,locale',
                'access_token': os.environ['PAGE_ACCESS_TOKEN']}
     url = "https://graph.facebook.com/v2.6/{user_id:s}".format(user_id=player_id)
-    resp = requests.post(url, params=payload)
+    resp = requests.get(url, params=payload)
     return resp.json()
 
 
