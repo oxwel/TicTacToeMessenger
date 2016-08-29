@@ -223,7 +223,7 @@ def get_user_profile(player_id):
 def get_next_step(player_id, message, send_message):
     player_id = str(player_id)
     player_session = get_existing_game(player_id)
-    app.logger.info(player_session)
+    app.logger.info('Saved session: {}'.format(player_session))
 
     board = None
     lang = None
@@ -238,12 +238,14 @@ def get_next_step(player_id, message, send_message):
             ask_again(player_id, send_message)
             return
         if not board:
+            app.logger.info('New board')
             newBoard = ['_'] * 10
             if not player_session:
                 player_sessions[player_id] = {}
+                player_sessions[player_id]['profile'] = get_user_profile(player_id)
+                app.logger.info('New session')
+                app.logger.info(player_session[player_id])
             player_sessions[player_id]['board'] = newBoard
-            player_sessions[player_id]['profile'] = get_user_profile(player_id)
-            app.logger.info(player_session[player_id])
             board = player_sessions[player_id]['board']
         print "new board = ", board
         print 'new player_session', player_sessions[player_id]
