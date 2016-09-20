@@ -47,7 +47,7 @@ def webhook():
                     message = x['message']['text']
                     recipient_id = x['sender']['id']
                     app.logger.info('Message from {0}:\n\t{1}'.format(recipient_id,message))
-                    tictactoe.get_next_step(recipient_id, message, send_message)
+                    tictactoe.process_user_input(recipient_id, message)
                 else:
                     pass
         except Exception, e:

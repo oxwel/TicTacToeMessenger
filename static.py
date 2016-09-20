@@ -1,3 +1,5 @@
+# coding=utf-8
+
 class States():
     NEW = 'NEW'
     EXISTING = 'EXISTING'
