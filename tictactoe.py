@@ -6,7 +6,7 @@ import os
 import re
 import requests
 from flask import current_app as app
-from reactions import greeting, text_message_sender, send_text_message, start_the_game
+from reactions import text_message_sender, send_text_message, start_the_game
 from static import States, MsgTypes, Langs
 
 player_sessions = {}
