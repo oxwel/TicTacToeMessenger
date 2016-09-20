@@ -31,7 +31,7 @@ def send_text_message(recipient_id, text):
 
 def text_message_sender(text):
     def f(user_id, **kwargs):
-        return send_text_message(text, user_id)
+        return send_text_message(user_id, text)
     return f
 
 
