@@ -32,3 +32,11 @@ win_message = 'Ура!!! Ты выиграл! Напиши PLAY, чтобы сы
 lose_message = 'Ой, ты проиграл. Напиши PLAY, чтобы сыграть еще раз'
 
 tie_message = 'Победила дружба! Напиши PLAY, чтобы сыграть еще раз'
+
+expected_greetings = ['hi', 'hello']
+language = ['language', 'ru']
+rules_request = ['rules', 'help']
+start = ['play', 'start']
+turn = ['\d']
+
+greeting_reaction = 'greeting reaction'

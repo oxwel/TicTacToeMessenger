@@ -1,10 +1,13 @@
 # coding=utf-8
 # Tic Tac Toe
-import os
 import random
 
+import os
+import re
 import requests
 from flask import current_app as app
+from reactions import greeting, text_message_sender, send_text_message, start_the_game
+from static import States, MsgTypes, Langs
 
 player_sessions = {}
 message_strings = None
@@ -123,17 +126,56 @@ def isBoardEmpty(board):
     return True
 
 
+def get_user_profile(player_id):
+    payload = {'fields': 'first_name,locale',
+               'access_token': os.environ['PAGE_ACCESS_TOKEN']}
+    url = "https://graph.facebook.com/v2.6/{user_id:s}".format(user_id=player_id)
+    resp = requests.get(url, params=payload)
+    return resp.json()
+
+
+class Session(object):
+    def __init__(self, user_id):
+        self.board = None
+        self.play_first = True
+        self.lang = Langs.EN
+        self.profile = get_user_profile(user_id)
+        self.state = States.NEW
+
+
+def new_session(player_id):
+    player_sessions[player_id] = {'board': None,
+                                  'play_first': True,
+                                  'lang': Langs.EN,
+                                  'profile': get_user_profile(player_id),
+                                  'state': States.NEW
+                                  }
+    return player_sessions[player_id]
+
+
+def get_session(user_id):
+    session = player_sessions.get(user_id)
+    if session is None:
+        session = Session(user_id)
+        player_sessions[user_id] = session
+    return session
+
+
 def get_existing_game(player_id):
-    return player_sessions.get(player_id, None)
+    session = player_sessions.get(player_id, None)
+    if session is not None:
+        return session
+    else:
+        return new_session(player_id)
 
 
 def ask_for_input(player_id, send_message):
     send_message(player_id, message_strings.ask_for_input_string)
 
 
-def send_rules(player_id, send_message):
-    send_message(player_id, message_strings.rules_part1)
-    send_message(player_id, message_strings.rules_part2)
+def send_rules(user_id, send_message):
+    send_message(user_id, message_strings.rules_part1)
+    send_message(user_id, message_strings.rules_part2)
     pass
 
 
@@ -154,8 +196,8 @@ def ask_again(player_id, send_message):
     send_message(player_id, msg)
 
 
-def set_lang(message):
-    if message and 'RU' in message.upper():
+def set_lang(message, **kw):
+    if message and Langs.RU in message.upper():
         import strings_ru as message_strings_local
     else:
         import strings_en as message_strings_local
@@ -212,12 +254,49 @@ def make_player_move(player_id, board, message, send_message):
     return True
 
 
-def get_user_profile(player_id):
-    payload = {'fields': 'first_name,locale',
-               'access_token': os.environ['PAGE_ACCESS_TOKEN']}
-    url = "https://graph.facebook.com/v2.6/{user_id:s}".format(user_id=player_id)
-    resp = requests.get(url, params=payload)
-    return resp.json()
+def change_lang(user_id, session, message):
+    session.lang = Langs.read(message, default=Langs.EN)
+    set_lang(session.lang)
+    send_text_message(user_id, message_strings.lang_confirmation)
+
+
+def get_reaction(state, msg_type):
+    REACTIONS = {
+        States.NEW: {
+            MsgTypes.GREETING: text_message_sender(message_strings.greeting_reaction),
+            MsgTypes.LANGUAGE: change_lang,
+            MsgTypes.RULES: send_rules,
+            MsgTypes.START: start_the_game
+        }
+    }
+    return REACTIONS[state][msg_type]
+
+
+def pattern(s):
+    return r'\b{0:s}\b'.format(s)
+
+
+def classify_msg(message):
+    clues = {
+            MsgTypes.GREETING: message_strings.expected_greetings,
+            MsgTypes.LANGUAGE: message_strings.language,
+            MsgTypes.RULES: message_strings.rules_request,
+            MsgTypes.START: message_strings.start,
+            MsgTypes.TURN: message_strings.turn
+    }
+    for msg_type, clues in clues.items():
+        if any([re.search(pattern(s), message) for s in clues]):
+            return msg_type
+    else:
+        return MsgTypes.UNCLASSIFIED
+
+
+def process_user_input(user_id, message):
+    session = get_session(user_id)
+    state = session.state
+    set_lang(session.lang)
+    msg_type = classify_msg(message)
+    get_reaction(state, msg_type)(user_id=user_id)
 
 
 def get_next_step(player_id, message, send_message):
