@@ -191,11 +191,6 @@ def send_language_option(player_id, send_message):
     send_message(player_id, language_option)
 
 
-def ask_again(player_id, send_message):
-    msg = random.choice(app.config['ASK_AGAIN_LIST'])
-    send_message(player_id, msg)
-
-
 def set_lang(message, **kw):
     if message and Langs.RU in message.upper():
         import strings_ru as message_strings_local
@@ -266,7 +261,8 @@ def get_reaction(state, msg_type):
             MsgTypes.GREETING: text_message_sender(message_strings.greeting_reaction),
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: send_rules,
-            MsgTypes.START: start_the_game
+            MsgTypes.START: start_the_game,
+            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
         }
     }
     return REACTIONS[state][msg_type]
@@ -293,6 +289,7 @@ def classify_msg(message):
 
 def process_user_input(user_id, message):
     session = get_session(user_id)
+    app.logger.info(session)
     state = session.state
     set_lang(session.lang)
     msg_type = classify_msg(message)

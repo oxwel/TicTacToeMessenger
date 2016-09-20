@@ -39,4 +39,6 @@ rules_request = ['rules', 'help']
 start = ['play', 'start']
 turn = ['\d']
 
-greeting_reaction = 'greeting reaction'
+greeting_reaction = 'greeting reaction ru'
+
+ask_again = 'I don\'t understand you ru'

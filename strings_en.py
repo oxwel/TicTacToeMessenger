@@ -41,3 +41,5 @@ start = ['play', 'start']
 turn = ['\d']
 
 greeting_reaction = 'greeting reaction'
+
+ask_again = 'I don\'t understand you'

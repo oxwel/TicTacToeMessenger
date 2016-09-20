@@ -17,6 +17,7 @@ def call_send_api(message_data):
 
 
 def send_text_message(recipient_id, text):
+    app.logger.info('sending message to {}'.format(recipient_id))
     message_data = json.dumps({
         'recipient': {
             'id': recipient_id
