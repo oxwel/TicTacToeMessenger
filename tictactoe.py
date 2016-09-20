@@ -1,7 +1,8 @@
 # coding=utf-8
 # Tic Tac Toe
-import random
+from __future__ import unicode_literals
 
+import random
 import os
 import re
 import requests
@@ -269,7 +270,7 @@ def get_reaction(state, msg_type):
 
 
 def pattern(s):
-    return r'\b{0:s}\b'.format(s)
+    return ur'\b{0:s}\b'.format(s)
 
 
 def classify_msg(message):
@@ -281,7 +282,7 @@ def classify_msg(message):
             MsgTypes.TURN: message_strings.turn
     }
     for msg_type, clues in clues.items():
-        if any([re.search(pattern(s), message) for s in clues]):
+        if any([re.search(pattern(s), message, re.UNICODE) for s in clues]):
             return msg_type
     else:
         return MsgTypes.UNCLASSIFIED
@@ -296,67 +297,67 @@ def process_user_input(user_id, message):
     get_reaction(state, msg_type)(user_id=user_id)
 
 
-def get_next_step(player_id, message, send_message):
-    player_id = str(player_id)
-    player_session = get_existing_game(player_id)
-    app.logger.info('Saved session: {}'.format(player_session))
-
-    board = None
-    lang = None
-    player_first = True
-    if player_session:
-        lang = player_session.get('lang', None)
-        set_lang(lang)
-        board = player_session.get('board', None)
-        player_first = player_session.get('play_first', True)
-    if not player_session or not board:
-        if message.upper() != 'PLAY':
-            ask_again(player_id, send_message)
-            return
-        if not board:
-            app.logger.info('New board')
-            newBoard = ['_'] * 10
-            if not player_session:
-                player_sessions[player_id] = {}
-                player_sessions[player_id]['profile'] = get_user_profile(player_id)
-                app.logger.info('New session')
-                app.logger.info(player_sessions[player_id])
-            player_sessions[player_id]['board'] = newBoard
-            board = player_sessions[player_id]['board']
-        print "new board = ", board
-        print 'new player_session', player_sessions[player_id]
-        if not lang:
-            if not player_sessions[player_id]['profile']['locale']:
-                send_language_option(player_id, send_message)
-                return
-            else:
-                player_session['lang'] = player_sessions[player_id]['profile']['locale']
-                set_lang(player_session['lang'])
-                send_rules_option(player_id, send_message)
-        if not player_first:
-            make_computer_move(player_id, board, send_message)
-    elif message.upper() == 'EN' or message.upper() == 'RU':
-        player_session = get_existing_game(player_id)
-        if not player_session:
-            ask_again(player_id, send_message)
-            return
-        player_session['lang'] = message.upper()
-        set_lang(message)
-        send_rules_option(player_id, send_message)
-    elif message.upper() == message_strings.rule_string:
-        send_rules(player_id, send_message)
-    else:
-
-        if player_first or not isBoardEmpty(board):
-            if not make_player_move(player_id, board, message, send_message):
-                ask_again(player_id, send_message)
-                return
-            if not make_computer_move(player_id, board, send_message):
-                ask_again(player_id, send_message)
-                return
-        else:
-            if isBoardEmpty(board) and not make_computer_move(player_id, board, send_message):
-                ask_again(player_id, send_message)
-                return
-
-    ask_for_input(player_id, send_message)
+# def get_next_step(player_id, message, send_message):
+#     player_id = str(player_id)
+#     player_session = get_existing_game(player_id)
+#     app.logger.info('Saved session: {}'.format(player_session))
+#
+#     board = None
+#     lang = None
+#     player_first = True
+#     if player_session:
+#         lang = player_session.get('lang', None)
+#         set_lang(lang)
+#         board = player_session.get('board', None)
+#         player_first = player_session.get('play_first', True)
+#     if not player_session or not board:
+#         if message.upper() != 'PLAY':
+#             ask_again(player_id, send_message)
+#             return
+#         if not board:
+#             app.logger.info('New board')
+#             newBoard = ['_'] * 10
+#             if not player_session:
+#                 player_sessions[player_id] = {}
+#                 player_sessions[player_id]['profile'] = get_user_profile(player_id)
+#                 app.logger.info('New session')
+#                 app.logger.info(player_sessions[player_id])
+#             player_sessions[player_id]['board'] = newBoard
+#             board = player_sessions[player_id]['board']
+#         print "new board = ", board
+#         print 'new player_session', player_sessions[player_id]
+#         if not lang:
+#             if not player_sessions[player_id]['profile']['locale']:
+#                 send_language_option(player_id, send_message)
+#                 return
+#             else:
+#                 player_session['lang'] = player_sessions[player_id]['profile']['locale']
+#                 set_lang(player_session['lang'])
+#                 send_rules_option(player_id, send_message)
+#         if not player_first:
+#             make_computer_move(player_id, board, send_message)
+#     elif message.upper() == 'EN' or message.upper() == 'RU':
+#         player_session = get_existing_game(player_id)
+#         if not player_session:
+#             ask_again(player_id, send_message)
+#             return
+#         player_session['lang'] = message.upper()
+#         set_lang(message)
+#         send_rules_option(player_id, send_message)
+#     elif message.upper() == message_strings.rule_string:
+#         send_rules(player_id, send_message)
+#     else:
+#
+#         if player_first or not isBoardEmpty(board):
+#             if not make_player_move(player_id, board, message, send_message):
+#                 ask_again(player_id, send_message)
+#                 return
+#             if not make_computer_move(player_id, board, send_message):
+#                 ask_again(player_id, send_message)
+#                 return
+#         else:
+#             if isBoardEmpty(board) and not make_computer_move(player_id, board, send_message):
+#                 ask_again(player_id, send_message)
+#                 return
+#
+#     ask_for_input(player_id, send_message)
