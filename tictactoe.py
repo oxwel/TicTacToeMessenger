@@ -294,7 +294,7 @@ def process_user_input(user_id, message):
     state = session.state
     set_lang(session.lang)
     msg_type = classify_msg(message)
-    get_reaction(state, msg_type)(user_id=user_id)
+    get_reaction(state, msg_type)(user_id=user_id, session=session, message=message)
 
 
 # def get_next_step(player_id, message, send_message):
