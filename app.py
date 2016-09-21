@@ -5,14 +5,19 @@ from logging.handlers import RotatingFileHandler
 import sys
 
 from flask import Flask, request, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
 import os
 import requests
+from sqlalchemy.exc import OperationalError
 
 app = Flask(__name__, static_url_path='')
 app.config.from_pyfile('config.py')
 app.config.from_pyfile('phrases_config.py')
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['LOGFILE'] = 'application.log'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+
+db = SQLAlchemy(app)
 
 # file_handler = RotatingFileHandler(app.config['LOGFILE'], 'w', 1 * 1024 * 1024, 10)
 # file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
@@ -51,6 +56,8 @@ def webhook():
                     tictactoe.process_user_input(recipient_id, message)
                 else:
                     pass
+        except OperationalError:
+            db.create_all()
         except Exception, e:
             app.logger.error(e.message)
         return "failure"

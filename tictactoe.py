@@ -6,7 +6,9 @@ import random
 import os
 import re
 import requests
+from app import db
 from flask import current_app as app
+from models import User
 from reactions import text_message_sender, send_text_message, multiple_messages_sender
 from static import States, MsgTypes, Langs
 
@@ -257,6 +259,13 @@ def new_board():
 
 
 def start_the_game(user_id, session, message):
+    user = User.query.filter_by(fb_id=user_id).first()
+    if user is None:
+        user = User(fb_id=user_id)
+    user.games = user.games + 1
+    db.session.add(user)
+    db.session.commit()
+
     session.state = States.IN_GAME
     session.board = new_board()
     if session.play_first:
