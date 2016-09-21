@@ -7,14 +7,14 @@ import os
 import re
 import requests
 from flask import current_app as app
-from reactions import text_message_sender, send_text_message, start_the_game, multiple_messages_sender
+from reactions import text_message_sender, send_text_message, multiple_messages_sender
 from static import States, MsgTypes, Langs
 
 player_sessions = {}
 message_strings = None
 
 
-def drawBoard(board, player_id, send_message):
+def drawBoard(board, player_id):
     # This function prints out the board that it was passed.
 
     # "board" is a list of 10 strings representing the board (ignore index 0)
@@ -25,7 +25,7 @@ def drawBoard(board, player_id, send_message):
         message += '\n'
         index += 3
 
-    send_message(player_id, message)
+    send_text_message(player_id, message)
 
 
 def makeMove(board, letter, move):
@@ -170,16 +170,6 @@ def get_existing_game(player_id):
         return new_session(player_id)
 
 
-def ask_for_input(player_id, send_message):
-    send_message(player_id, message_strings.ask_for_input_string)
-
-
-def send_rules(user_id, send_message):
-    send_message(user_id, message_strings.rules_part1)
-    send_message(user_id, message_strings.rules_part2)
-    pass
-
-
 def send_rules_option(player_id, send_message):
     send_message(player_id, message_strings.rules_option)
 
@@ -209,44 +199,46 @@ def reset_player(player_id):
                                   }
 
 
-def make_computer_move(player_id, board, send_message):
+def make_computer_move(player_id, session):
+    board = session.board
     move = getComputerMove(board, 'O')
     makeMove(board, 'O', move)
-    drawBoard(board, player_id, send_message)
+    drawBoard(board, player_id)
     if isWinner(board, 'O'):
-        send_message(player_id, message_strings.lose_message)
+        send_text_message(player_id, message_strings.lose_message)
         reset_player(player_id)
-        return False
     elif isBoardFull(board):
-        send_message(player_id, message_strings.tie_message)
+        send_text_message(player_id, message_strings.tie_message)
         reset_player(player_id)
-        return False
-    return True
+    session.board = board
 
 
-def make_player_move(player_id, board, message, send_message):
+def make_player_move(user_id, session, message):
     try:
         move = int(message)
     except:
-        send_message(player_id, message_strings.valid_move_string)
+        send_text_message(user_id, message_strings.valid_move_string)
         return False
+    board = session.board
     if move < 1 or move > 9:
-        send_message(player_id, message_strings.valid_move_string)
+        send_text_message(user_id, message_strings.valid_move_string)
         return False
     elif not isSpaceFree(board, move):
-        send_message(player_id, message_strings.space_occupied)
+        send_text_message(user_id, message_strings.space_occupied)
         return False
     else:
         makeMove(board, 'X', move)
-        drawBoard(board, player_id, send_message)
+        drawBoard(board, user_id)
         if isWinner(board, 'X'):
-            send_message(player_id, message_strings.win_message)
-            reset_player(player_id)
+            send_text_message(user_id, message_strings.win_message)
+            reset_player(user_id)
             return False
         elif isBoardFull(board):
-            send_message(player_id, message_strings.tie_message)
-            reset_player(player_id)
+            send_text_message(user_id, message_strings.tie_message)
+            reset_player(user_id)
             return False
+        else:
+            make_computer_move(user_id, session)
     return True
 
 
@@ -256,6 +248,24 @@ def change_lang(user_id, session, message):
     send_text_message(user_id, message_strings.lang_confirmation)
 
 
+def ask_for_move(user_id):
+    send_text_message(user_id, message_strings.ask_for_move)
+
+
+def new_board():
+    return ['_'] * 10
+
+
+def start_the_game(user_id, session, message):
+    session.state = States.IN_GAME
+    session.board = new_board()
+    if session.play_first:
+        ask_for_move(user_id)
+    else:
+        make_computer_move(user_id, session)
+        
+    
+
 def get_reaction(state, msg_type):
     REACTIONS = {
         States.NEW: {
@@ -264,6 +274,14 @@ def get_reaction(state, msg_type):
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.START: start_the_game,
             MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
+        },
+        States.IN_GAME: {
+            MsgTypes.GREETING: text_message_sender(message_strings.late_greeting_reaction),
+            MsgTypes.LANGUAGE: change_lang,
+            MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
+            MsgTypes.TURN: make_player_move,
+            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
+
         }
     }
     return REACTIONS[state][msg_type]

@@ -1,6 +1,7 @@
 # coding=utf-8
 
 class States():
+    IN_GAME = 'IN_GAME'
     NEW = 'NEW'
     EXISTING = 'EXISTING'
 

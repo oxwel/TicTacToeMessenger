@@ -21,7 +21,7 @@ rules_option = '''
 Для начала игры напиши число от 1 до 9
 '''
 
-ask_for_input_string = "Твой ход!"
+ask_for_move = "Твой ход!"
 
 valid_move_string = "Что-то не то. Введи правильное число."
 
@@ -42,6 +42,7 @@ start = ['play', 'start']
 turn = ['\d']
 
 greeting_reaction = 'greeting reaction ru'
+late_greeting_reaction = 'late greeting reaction ru'
 
 ask_again = 'I don\'t understand you ru'
 

@@ -40,6 +40,3 @@ def multiple_messages_sender(*messages):
         for msg in messages:
             send_text_message(user_id, msg)
     return f
-
-def start_the_game(**kwargs):
-    pass

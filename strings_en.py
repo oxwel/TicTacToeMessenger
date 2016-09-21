@@ -20,7 +20,7 @@ To read how to play type RULES.
 To start playing type a number between 1-9
 '''
 
-ask_for_input_string = "What's your next move?"
+ask_for_move = "What's your next move?"
 
 valid_move_string = "Please enter a valid move"
 
@@ -41,6 +41,7 @@ start = ['play', 'start']
 turn = ['\d']
 
 greeting_reaction = 'greeting reaction'
+late_greeting_reaction = 'late greeting reaction'
 
 ask_again = 'I don\'t understand you'
 
