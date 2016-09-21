@@ -7,7 +7,7 @@ import os
 import re
 import requests
 from flask import current_app as app
-from reactions import text_message_sender, send_text_message, start_the_game
+from reactions import text_message_sender, send_text_message, start_the_game, multiple_messages_sender
 from static import States, MsgTypes, Langs
 
 player_sessions = {}
@@ -261,7 +261,7 @@ def get_reaction(state, msg_type):
         States.NEW: {
             MsgTypes.GREETING: text_message_sender(message_strings.greeting_reaction),
             MsgTypes.LANGUAGE: change_lang,
-            MsgTypes.RULES: text_message_sender(message_strings.rules_part1+'\n'+message_strings.rules_part2),
+            MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.START: start_the_game,
             MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
         }

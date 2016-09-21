@@ -52,7 +52,7 @@ def webhook():
                 else:
                     pass
         except Exception, e:
-            print e
+            app.logger.error(e.message)
         return "failure"
 
 
