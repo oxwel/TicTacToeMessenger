@@ -261,7 +261,7 @@ def get_reaction(state, msg_type):
         States.NEW: {
             MsgTypes.GREETING: text_message_sender(message_strings.greeting_reaction),
             MsgTypes.LANGUAGE: change_lang,
-            MsgTypes.RULES: send_rules,
+            MsgTypes.RULES: text_message_sender(message_strings.rules_part1+'\n'+message_strings.rules_part2),
             MsgTypes.START: start_the_game,
             MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
         }

@@ -36,7 +36,7 @@ lose_message = 'Ой, ты проиграл. Напиши PLAY, чтобы сы�
 tie_message = 'Победила дружба! Напиши PLAY, чтобы сыграть еще раз'
 
 expected_greetings = ['hi', 'hello']
-language = ['language', 'ru']
+language = ['language', 'ru', 'en']
 rules_request = ['rules', 'help']
 start = ['play', 'start']
 turn = ['\d']
@@ -44,3 +44,5 @@ turn = ['\d']
 greeting_reaction = 'greeting reaction ru'
 
 ask_again = 'I don\'t understand you ru'
+
+lang_confirmation = 'Язык изменен'
