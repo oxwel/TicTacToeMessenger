@@ -195,7 +195,7 @@ def reset_player(player_id):
     player_session = player_sessions[player_id]
     player_sessions[player_id] = {'board': None,
                                   'play_first': not player_session.get('play_first', True),
-                                  'lang': player_session.get('lang', 'EN')
+                                  'state': States.NEW
                                   }
 
 
@@ -280,8 +280,8 @@ def get_reaction(state, msg_type):
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.TURN: make_player_move,
-            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
-
+            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again),
+            MsgTypes.START: start_the_game,
         }
     }
     return REACTIONS[state][msg_type]
