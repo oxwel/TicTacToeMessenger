@@ -336,7 +336,7 @@ def process_user_input(user_id, message):
 
 def identify_postback(payload):
     return {'PAYLOAD_START_NEW_GAME': MsgTypes.START,
-            }.get(payload, default=MsgTypes.UNCLASSIFIED)
+            }.get(payload, MsgTypes.UNCLASSIFIED)
 
 
 def process_postback(user_id, payload):
