@@ -64,8 +64,8 @@ def webhook():
                     pass
         except OperationalError:
             db.create_all()
-        except Exception, e:
-            app.logger.error(e.message)
+        # except Exception, e:
+        #     app.logger.error(e.message)
         return "failure"
 
 

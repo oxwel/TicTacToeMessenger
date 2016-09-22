@@ -320,7 +320,7 @@ def classify_msg(message):
 
 def process_user_input(user_id, message):
     session = get_session(user_id)
-    app.logger.info(session)
+    # app.logger.info(session)
     state = session.state
     set_lang(session.lang)
     msg_type = classify_msg(message)
