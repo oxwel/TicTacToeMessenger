@@ -34,7 +34,7 @@ lose_message = 'Sorry, you lost. Type PLAY to start again'
 
 tie_message = 'Well, the game is a tie. Type PLAY to start again'
 
-expected_greetings = ['hi', 'hello', 'hallo', 'good' 'morning', 'good' 'afternoon', 'good' 'evening', 'wassup']
+expected_greetings = ['hi', 'hello', 'hallo', 'good morning', 'good afternoon', 'good evening', 'wassup']
 language = ['language', 'ru', 'en']
 rules_request = ['rules', 'help']
 start = ['play', 'start']
@@ -58,3 +58,7 @@ ask_again = ['I need to ask someone what you mean',
              'Maybe we should find an interpreter? ']
 
 lang_confirmation = 'Language changed'
+
+good_start = 'Good start!'
+
+one_left = 'Only one move left. Come on!'

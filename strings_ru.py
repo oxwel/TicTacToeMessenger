@@ -55,3 +55,7 @@ late_greeting_reaction = 'late greeting reaction ru'
 ask_again = ['Не понимаю']
 
 lang_confirmation = 'Язык изменен'
+
+good_start = 'Гуд start!'
+
+one_left = 'Онли one move left. Come on!'

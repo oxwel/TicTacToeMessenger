@@ -189,6 +189,10 @@ def make_computer_move(player_id, session):
     :type session: Session
     """
     board = session.board
+
+    if board.count('_') == 9:
+        send_text_message(player_id, message_strings.good_start)
+
     move = getComputerMove(board, 'O')
     makeMove(board, 'O', move)
     drawBoard(board, player_id)
@@ -204,6 +208,8 @@ def make_computer_move(player_id, session):
         user = User.query.filter_by(fb_id=player_id).first()
         user.ties += 1
         db.session.add(user)
+    elif board.count('_') <= 3:
+        send_text_message(player_id, message_strings.one_left)
     session.board = board
 
 
@@ -304,7 +310,7 @@ def get_reaction(state, msg_type, username):
             MsgTypes.START: start_the_game,
         }
     }
-    return REACTIONS[state][msg_type]
+    return REACTIONS[state].get(msg_type, text_message_sender(random.choice(message_strings.ask_again)))
 
 
 def pattern(s):
