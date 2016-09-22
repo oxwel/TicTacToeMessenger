@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>user_id</th>
+        <th>games</th>
+        <th>wins</th>
+        <th>losses</th>
+        <th>ties</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <th> {{ user.fb_id }} </th>
+        <th> {{ user.games }} </th>
+        <th> {{ user.wins }} </th>
+        <th> {{ user.losses }} </th>
+        <th> {{ user.ties }} </th>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

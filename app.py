@@ -1,10 +1,9 @@
 # coding=utf-8
 import logging
-from logging.handlers import RotatingFileHandler
 
 import sys
 
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 import requests
@@ -15,7 +14,7 @@ app.config.from_pyfile('config.py')
 app.config.from_pyfile('phrases_config.py')
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['LOGFILE'] = 'application.log'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
 db = SQLAlchemy(app)
 
@@ -36,6 +35,13 @@ import tictactoe
 def logs():
     return send_from_directory('.', app.config['LOGFILE'])
 
+
+@app.route('/stats', methods=['GET'])
+def stats():
+    from models import User
+    stats = User.query.limit(250).all()
+
+    return render_template('stats.html', users = stats)
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():

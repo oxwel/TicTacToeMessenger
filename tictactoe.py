@@ -145,15 +145,10 @@ class Session(object):
         self.profile = get_user_profile(user_id)
         self.state = States.NEW
 
-
-def new_session(player_id):
-    player_sessions[player_id] = {'board': None,
-                                  'play_first': True,
-                                  'lang': Langs.EN,
-                                  'profile': get_user_profile(player_id),
-                                  'state': States.NEW
-                                  }
-    return player_sessions[player_id]
+    def reset(self):
+        self.board = None
+        self.play_first = not self.play_first
+        self.state = States.NEW
 
 
 def get_session(user_id):
@@ -162,14 +157,6 @@ def get_session(user_id):
         session = Session(user_id)
         player_sessions[user_id] = session
     return session
-
-
-def get_existing_game(player_id):
-    session = player_sessions.get(player_id, None)
-    if session is not None:
-        return session
-    else:
-        return new_session(player_id)
 
 
 def send_rules_option(player_id, send_message):
@@ -193,29 +180,37 @@ def set_lang(message, **kw):
     message_strings = message_strings_local
 
 
-def reset_player(player_id):
-    player_session = player_sessions[player_id]
-    player_sessions[player_id] = {'board': None,
-                                  'play_first': not player_session.get('play_first', True),
-                                  'state': States.NEW
-                                  }
-
-
 def make_computer_move(player_id, session):
+    """
+
+    :type session: Session
+    """
     board = session.board
     move = getComputerMove(board, 'O')
     makeMove(board, 'O', move)
     drawBoard(board, player_id)
     if isWinner(board, 'O'):
         send_text_message(player_id, message_strings.lose_message)
-        reset_player(player_id)
+        user = User.query.filter_by(fb_id=player_id).first()
+        user.losses +=1
+        db.session.add(user)
+        db.session.commit()
+        session.reset()
     elif isBoardFull(board):
         send_text_message(player_id, message_strings.tie_message)
-        reset_player(player_id)
+        user = User.query.filter_by(fb_id=player_id).first()
+        user.ties += 1
+        db.session.add(user)
+        db.session.commit()
+        session.reset()
     session.board = board
 
 
 def make_player_move(user_id, session, message):
+    """
+
+    :type session: Session
+    """
     try:
         move = int(message)
     except:
@@ -233,11 +228,19 @@ def make_player_move(user_id, session, message):
         drawBoard(board, user_id)
         if isWinner(board, 'X'):
             send_text_message(user_id, message_strings.win_message)
-            reset_player(user_id)
+            user = User.query.filter_by(fb_id=user_id).first()
+            user.wins += 1
+            db.session.add(user)
+            db.session.commit()
+            session.reset()
             return False
         elif isBoardFull(board):
             send_text_message(user_id, message_strings.tie_message)
-            reset_player(user_id)
+            user = User.query.filter_by(fb_id=user_id).first()
+            user.ties += 1
+            db.session.add(user)
+            db.session.commit()
+            session.reset()
             return False
         else:
             make_computer_move(user_id, session)
@@ -262,7 +265,7 @@ def start_the_game(user_id, session, message):
     user = User.query.filter_by(fb_id=user_id).first()
     if user is None:
         user = User(fb_id=user_id)
-    user.games = user.games + 1
+    user.games += 1
     db.session.add(user)
     db.session.commit()
 
