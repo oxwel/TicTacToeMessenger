@@ -194,16 +194,16 @@ def make_computer_move(player_id, session):
     drawBoard(board, player_id)
     if isWinner(board, 'O'):
         send_text_message(player_id, message_strings.lose_message)
-        user = User.query.filter_by(fb_id=player_id).first()
-        user.losses +=1
-        db.session.add(user)
         session.reset()
+        user = User.query.filter_by(fb_id=player_id).first()
+        user.losses += 1
+        db.session.add(user)
     elif isBoardFull(board):
         send_text_message(player_id, message_strings.tie_message)
+        session.reset()
         user = User.query.filter_by(fb_id=player_id).first()
         user.ties += 1
         db.session.add(user)
-        session.reset()
     session.board = board
 
 
@@ -229,17 +229,17 @@ def make_player_move(user_id, session, message):
         drawBoard(board, user_id)
         if isWinner(board, 'X'):
             send_text_message(user_id, message_strings.win_message)
+            session.reset()
             user = User.query.filter_by(fb_id=user_id).first()
             user.wins += 1
             db.session.add(user)
-            session.reset()
             return False
         elif isBoardFull(board):
             send_text_message(user_id, message_strings.tie_message)
+            session.reset()
             user = User.query.filter_by(fb_id=user_id).first()
             user.ties += 1
             db.session.add(user)
-            session.reset()
             return False
         else:
             make_computer_move(user_id, session)
