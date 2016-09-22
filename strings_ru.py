@@ -52,6 +52,6 @@ greeting_reactions = ['Hi, {username}',
                       ]
 late_greeting_reaction = 'late greeting reaction ru'
 
-ask_again = 'I don\'t understand you ru'
+ask_again = ['Не понимаю']
 
 lang_confirmation = 'Язык изменен'

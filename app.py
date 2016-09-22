@@ -67,7 +67,8 @@ def webhook():
                     app.logger.info('postback received from {}'.format(recipient_id))
                     if 'payload' in postback:
                         app.logger.info('payload: {}'.format(postback['payload']))
-
+                        tictactoe.process_postback(user_id=recipient_id, payload=postback['payload'])
+                        db.session.commit()
                 else:
                     pass
         except Exception, e:

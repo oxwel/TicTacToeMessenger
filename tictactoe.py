@@ -284,6 +284,9 @@ def greeting(username):
     
 
 def get_reaction(state, msg_type, username):
+    """
+    :rtype: function
+    """
     REACTIONS = {
         States.NEW: {
             MsgTypes.GREETING: greeting(username),
@@ -325,74 +328,19 @@ def classify_msg(message):
 
 def process_user_input(user_id, message):
     session = get_session(user_id)
-    # app.logger.info(session)
     state = session.state
     set_lang(session.lang)
     msg_type = classify_msg(message)
     get_reaction(state, msg_type, session.name)(user_id=user_id, session=session, message=message)
 
 
-# def get_next_step(player_id, message, send_message):
-#     player_id = str(player_id)
-#     player_session = get_existing_game(player_id)
-#     app.logger.info('Saved session: {}'.format(player_session))
-#
-#     board = None
-#     lang = None
-#     player_first = True
-#     if player_session:
-#         lang = player_session.get('lang', None)
-#         set_lang(lang)
-#         board = player_session.get('board', None)
-#         player_first = player_session.get('play_first', True)
-#     if not player_session or not board:
-#         if message.upper() != 'PLAY':
-#             ask_again(player_id, send_message)
-#             return
-#         if not board:
-#             app.logger.info('New board')
-#             newBoard = ['_'] * 10
-#             if not player_session:
-#                 player_sessions[player_id] = {}
-#                 player_sessions[player_id]['profile'] = get_user_profile(player_id)
-#                 app.logger.info('New session')
-#                 app.logger.info(player_sessions[player_id])
-#             player_sessions[player_id]['board'] = newBoard
-#             board = player_sessions[player_id]['board']
-#         print "new board = ", board
-#         print 'new player_session', player_sessions[player_id]
-#         if not lang:
-#             if not player_sessions[player_id]['profile']['locale']:
-#                 send_language_option(player_id, send_message)
-#                 return
-#             else:
-#                 player_session['lang'] = player_sessions[player_id]['profile']['locale']
-#                 set_lang(player_session['lang'])
-#                 send_rules_option(player_id, send_message)
-#         if not player_first:
-#             make_computer_move(player_id, board, send_message)
-#     elif message.upper() == 'EN' or message.upper() == 'RU':
-#         player_session = get_existing_game(player_id)
-#         if not player_session:
-#             ask_again(player_id, send_message)
-#             return
-#         player_session['lang'] = message.upper()
-#         set_lang(message)
-#         send_rules_option(player_id, send_message)
-#     elif message.upper() == message_strings.rule_string:
-#         send_rules(player_id, send_message)
-#     else:
-#
-#         if player_first or not isBoardEmpty(board):
-#             if not make_player_move(player_id, board, message, send_message):
-#                 ask_again(player_id, send_message)
-#                 return
-#             if not make_computer_move(player_id, board, send_message):
-#                 ask_again(player_id, send_message)
-#                 return
-#         else:
-#             if isBoardEmpty(board) and not make_computer_move(player_id, board, send_message):
-#                 ask_again(player_id, send_message)
-#                 return
-#
-#     ask_for_input(player_id, send_message)
+def identify_postback(payload):
+    return {'PAYLOAD_START_NEW_GAME': MsgTypes.START,
+            }.get(payload, default=MsgTypes.UNCLASSIFIED)
+
+
+def process_postback(user_id, payload):
+    session = get_session(user_id)
+    state = session.state
+    msg_type = identify_postback(payload)
+    get_reaction(state, msg_type, session.name)(user_id=user_id, session=session, message=None)
