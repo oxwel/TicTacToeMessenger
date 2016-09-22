@@ -53,14 +53,21 @@ def webhook():
     else:
         try:
             output = request.json
-            event = output['entry'][0]['messaging']
-            for x in event:
-                if x.get('message') and x['message'].get('text'):
-                    message = x['message']['text']
-                    recipient_id = x['sender']['id']
+            events = output['entry'][0]['messaging']
+            for msg_event in events:
+                if msg_event.get('message') and msg_event['message'].get('text'):
+                    message = msg_event['message']['text']
+                    recipient_id = msg_event['sender']['id']
                     app.logger.info(u'Message from {0}:\n\t{1}'.format(recipient_id,message))
                     tictactoe.process_user_input(recipient_id, message)
                     db.session.commit()
+                elif msg_event.get('postback'):
+                    recipient_id = msg_event['sender']['id']
+                    postback = msg_event['postback']
+                    app.logger.info('postback received from {}'.format(recipient_id))
+                    if 'payload' in postback:
+                        app.logger.info('payload: {}'.format(postback['payload']))
+
                 else:
                     pass
         except Exception, e:

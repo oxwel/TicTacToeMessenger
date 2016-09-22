@@ -290,14 +290,14 @@ def get_reaction(state, msg_type, username):
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.START: start_the_game,
-            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice[message_strings.ask_again])
+            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again))
         },
         States.IN_GAME: {
-            MsgTypes.GREETING: text_message_sender(message_strings.late_greeting_reaction),
+            MsgTypes.GREETING: greeting(username),
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.TURN: make_player_move,
-            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice[message_strings.ask_again]),
+            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
             MsgTypes.START: start_the_game,
         }
     }
