@@ -194,14 +194,12 @@ def make_computer_move(player_id, session):
         user = User.query.filter_by(fb_id=player_id).first()
         user.losses +=1
         db.session.add(user)
-        db.session.commit()
         session.reset()
     elif isBoardFull(board):
         send_text_message(player_id, message_strings.tie_message)
         user = User.query.filter_by(fb_id=player_id).first()
         user.ties += 1
         db.session.add(user)
-        db.session.commit()
         session.reset()
     session.board = board
 
@@ -231,7 +229,6 @@ def make_player_move(user_id, session, message):
             user = User.query.filter_by(fb_id=user_id).first()
             user.wins += 1
             db.session.add(user)
-            db.session.commit()
             session.reset()
             return False
         elif isBoardFull(board):
@@ -239,7 +236,6 @@ def make_player_move(user_id, session, message):
             user = User.query.filter_by(fb_id=user_id).first()
             user.ties += 1
             db.session.add(user)
-            db.session.commit()
             session.reset()
             return False
         else:
@@ -262,12 +258,14 @@ def new_board():
 
 
 def start_the_game(user_id, session, message):
-    user = User.query.filter_by(fb_id=user_id).first()
-    if user is None:
-        user = User(fb_id=user_id)
-    user.games += 1
-    db.session.add(user)
-    db.session.commit()
+    try:
+        user = User.query.filter_by(fb_id=user_id).first()
+        if user is None:
+            user = User(fb_id=user_id)
+        user.games += 1
+        db.session.add(user)
+    except Exception as e:
+        app.logger.error(e)
 
     session.state = States.IN_GAME
     session.board = new_board()

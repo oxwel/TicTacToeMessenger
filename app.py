@@ -60,12 +60,11 @@ def webhook():
                     recipient_id = x['sender']['id']
                     app.logger.info(u'Message from {0}:\n\t{1}'.format(recipient_id,message))
                     tictactoe.process_user_input(recipient_id, message)
+                    db.session.commit()
                 else:
                     pass
-        except OperationalError:
-            db.create_all()
-        # except Exception, e:
-        #     app.logger.error(e.message)
+        except Exception, e:
+            app.logger.error(e.message)
         return "failure"
 
 
