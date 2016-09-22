@@ -18,12 +18,12 @@ class MsgTypes():
 
 class Choise:
     @classmethod
-    def class_vars(cls):
+    def choices(cls):
         return [(k, v) for k, v in cls.__dict__.items() if isinstance(v, str) and not k.startswith('__')]
 
     @classmethod
     def read(cls, message, default):
-        for alias, lang in cls.class_vars():
+        for alias, lang in cls.choices():
             if message.upper() == lang:
                 return lang
         else:
@@ -33,4 +33,12 @@ class Choise:
 class Langs(Choise):
     EN = 'EN'
     RU = 'RU'
+
+    @classmethod
+    def read_locale(cls, locale, default):
+        for alias, lang in cls.choices():
+            if lang in locale.upper:
+                return lang
+        else:
+            return default
 

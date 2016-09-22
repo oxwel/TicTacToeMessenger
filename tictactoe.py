@@ -141,9 +141,12 @@ class Session(object):
     def __init__(self, user_id):
         self.board = None
         self.play_first = True
-        self.lang = Langs.EN
-        self.profile = get_user_profile(user_id)
         self.state = States.NEW
+
+        profile = get_user_profile(user_id)
+
+        self.name = profile['first_name']
+        self.lang = Langs.read_locale(profile['locale'], Langs.EN)
 
     def reset(self):
         self.board = None
@@ -273,24 +276,28 @@ def start_the_game(user_id, session, message):
         ask_for_move(user_id)
     else:
         make_computer_move(user_id, session)
-        
+
+
+def greeting(username):
+    text = random.choice(message_strings.greeting_reactions).format(username=username)
+    return text_message_sender(text)
     
 
-def get_reaction(state, msg_type):
+def get_reaction(state, msg_type, username):
     REACTIONS = {
         States.NEW: {
-            MsgTypes.GREETING: text_message_sender(message_strings.greeting_reaction),
+            MsgTypes.GREETING: greeting(username),
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.START: start_the_game,
-            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again)
+            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice[message_strings.ask_again])
         },
         States.IN_GAME: {
             MsgTypes.GREETING: text_message_sender(message_strings.late_greeting_reaction),
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.TURN: make_player_move,
-            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.ask_again),
+            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice[message_strings.ask_again]),
             MsgTypes.START: start_the_game,
         }
     }
@@ -322,7 +329,7 @@ def process_user_input(user_id, message):
     state = session.state
     set_lang(session.lang)
     msg_type = classify_msg(message)
-    get_reaction(state, msg_type)(user_id=user_id, session=session, message=message)
+    get_reaction(state, msg_type, session.name)(user_id=user_id, session=session, message=message)
 
 
 # def get_next_step(player_id, message, send_message):

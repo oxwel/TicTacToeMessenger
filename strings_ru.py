@@ -42,6 +42,14 @@ start = ['play', 'start']
 turn = ['\d']
 
 greeting_reaction = 'greeting reaction ru'
+greeting_reactions = ['Hi, {username}',
+                      'Howdy',
+                      'Oh, hello',
+                      'Wassup!',
+                      '{username}, glad to see you again!',
+                      'Hi there',
+                      'Thanks for stopping by, {username}!'
+                      ]
 late_greeting_reaction = 'late greeting reaction ru'
 
 ask_again = 'I don\'t understand you ru'
