@@ -9,6 +9,8 @@ class States():
 
 
 class MsgTypes():
+    CONTINUE = 'CONTINUE'
+    CALL_HUMAN = 'CALL_HUMAN'
     EMOJI = 'EMOJI'
     UNCLASSIFIED = 'UNCLASSIFIED'
     GREETING = 'GREETING'
@@ -17,6 +19,7 @@ class MsgTypes():
     HELP = 'HELP'
     START = 'START'
     TURN = 'TURN'
+    ASK_HUMAN = 'ASK_HUMAN'
 
 
 class Choise:
@@ -47,6 +50,8 @@ class Langs(Choise):
 
 
 class Postbacks(Choise):
+    DECLINE_HUMAN = 'DECLINE_HUMAN'
+    ASK_HUMAN = 'ASK_HUMAN'
     ACCEPT_EMOJI = 'ACCEPT_EMOJI'
     DECLINE_EMOJI = 'DECLINE_EMOJI'
     START_NEW_GAME = 'PAYLOAD_START_NEW_GAME'

@@ -10,7 +10,8 @@ import requests
 from app import db
 from flask import current_app as app
 from models import User
-from reactions import text_message_sender, send_text_message, multiple_messages_sender, propose_emojis
+from reactions import text_message_sender, send_text_message, multiple_messages_sender, start_btn, \
+    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji
 from static import States, MsgTypes, Langs, Postbacks, emojis
 
 player_sessions = {}
@@ -303,7 +304,28 @@ def turn_emoji(user_id, session, message):
 def greeting(username):
     text = random.choice(message_strings.greeting_reactions).format(username=username)
     return text_message_sender(text)
-    
+
+
+def greeting_new(user_id, session, message):
+    text = random.choice(message_strings.greeting_reactions).format(username=session.name)
+    MsgWithButtons([start_btn], text).send(user_id)
+
+
+def ask_human(user_id, session, message):
+    MsgWithButtons([confirm_ask_human, decline_ask_human], message_strings.prompt_human_request).send(user_id)
+
+
+def call_human(user_id, session, message):
+    send_text_message(user_id, message_strings.confirm_human)
+
+
+def _continue(**kwargs):
+    pass
+
+
+def propose_emojis(user_id, text):
+    MsgWithButtons([accept_emoji, decline_emoji], message_strings.propose_emojis)
+
 
 def get_reaction(state, msg_type, username):
     """
@@ -311,12 +333,15 @@ def get_reaction(state, msg_type, username):
     """
     REACTIONS = {
         States.NEW: {
-            MsgTypes.GREETING: greeting(username),
+            MsgTypes.GREETING: greeting_new,
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.START: start_the_game,
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
-            MsgTypes.EMOJI: turn_emoji
+            MsgTypes.EMOJI: turn_emoji,
+            MsgTypes.ASK_HUMAN: ask_human,
+            MsgTypes.CALL_HUMAN: call_human,
+            MsgTypes.CONTINUE: _continue
         },
         States.IN_GAME: {
             MsgTypes.GREETING: greeting(username),
@@ -325,7 +350,8 @@ def get_reaction(state, msg_type, username):
             MsgTypes.TURN: make_player_move,
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
             MsgTypes.START: start_the_game,
-            MsgTypes.EMOJI: turn_emoji
+            MsgTypes.EMOJI: turn_emoji,
+            MsgTypes.ASK_HUMAN: ask_human
         }
     }
     return REACTIONS[state].get(msg_type, text_message_sender(random.choice(message_strings.ask_again)))
@@ -337,11 +363,12 @@ def pattern(s):
 
 def classify_msg(message):
     clues = {
-            MsgTypes.GREETING: message_strings.expected_greetings,
-            MsgTypes.LANGUAGE: message_strings.language,
-            MsgTypes.RULES: message_strings.rules_request,
-            MsgTypes.START: message_strings.start,
-            MsgTypes.TURN: message_strings.turn
+        MsgTypes.GREETING: message_strings.expected_greetings,
+        MsgTypes.LANGUAGE: message_strings.language,
+        MsgTypes.RULES: message_strings.rules_request,
+        MsgTypes.START: message_strings.start,
+        MsgTypes.TURN: message_strings.turn,
+        MsgTypes.ASK_HUMAN: message_strings.human_requests
     }
     for msg_type, clues in clues.items():
         if any([re.search(pattern(s), message, re.UNICODE) for s in clues]):
@@ -361,7 +388,9 @@ def process_user_input(user_id, message):
 def identify_postback(payload):
     return {Postbacks.START_NEW_GAME: MsgTypes.START,
             Postbacks.ACCEPT_EMOJI: MsgTypes.EMOJI,
-            Postbacks.DECLINE_EMOJI: MsgTypes.EMOJI
+            Postbacks.DECLINE_EMOJI: MsgTypes.EMOJI,
+            Postbacks.ASK_HUMAN: MsgTypes.CALL_HUMAN,
+            Postbacks.DECLINE_HUMAN: MsgTypes.CONTINUE
             }.get(payload, MsgTypes.UNCLASSIFIED)
 
 

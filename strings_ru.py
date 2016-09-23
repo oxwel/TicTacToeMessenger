@@ -61,3 +61,12 @@ good_start = 'Гуд start!'
 one_left = 'Онли one move left. Come on!'
 
 propose_emojis = "Ду ю want to play with strawberries and bananas?"
+
+human_requests = ['Human',
+                  'Chat',
+                  'Talk',
+                  'Order',
+                  'Shop']
+
+prompt_human_request = "Would you лайк to talk to a human being?"
+confirm_human = 'The оператор will join the conversation soon. Please write your question'

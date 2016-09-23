@@ -64,3 +64,12 @@ good_start = 'Good start!'
 one_left = 'Only one move left. Come on!'
 
 propose_emojis = "Do you want to play with strawberries and bananas?"
+
+human_requests = ['human',
+                  'chat',
+                  'talk',
+                  'order',
+                  'shop']
+
+prompt_human_request = "Would you like to talk to a human being?"
+confirm_human = 'The operator will join the conversation soon. Please write your question'
