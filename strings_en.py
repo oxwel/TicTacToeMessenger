@@ -62,3 +62,5 @@ lang_confirmation = 'Language changed'
 good_start = 'Good start!'
 
 one_left = 'Only one move left. Come on!'
+
+propose_emojis = "Do you want to play with strawberries and bananas?"

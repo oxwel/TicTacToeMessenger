@@ -3,20 +3,21 @@
 from __future__ import unicode_literals
 
 import random
+
 import os
 import re
 import requests
 from app import db
 from flask import current_app as app
 from models import User
-from reactions import text_message_sender, send_text_message, multiple_messages_sender
-from static import States, MsgTypes, Langs
+from reactions import text_message_sender, send_text_message, multiple_messages_sender, propose_emojis
+from static import States, MsgTypes, Langs, Postbacks, emojis
 
 player_sessions = {}
 message_strings = None
 
 
-def drawBoard(board, player_id):
+def drawBoard(board, player_id, session):
     # This function prints out the board that it was passed.
 
     # "board" is a list of 10 strings representing the board (ignore index 0)
@@ -26,6 +27,11 @@ def drawBoard(board, player_id):
         message += ' '.join(board[index:index + 3])
         message += '\n'
         index += 3
+
+    emoji = session.emoji
+    if emoji:
+        message = message.replace('X', emoji[0])
+        message = message.replace('O', emoji[1])
 
     send_text_message(player_id, message)
 
@@ -147,6 +153,7 @@ class Session(object):
 
         self.name = profile['first_name']
         self.lang = Langs.read_locale(profile['locale'], Langs.EN)
+        self.emoji = False
 
     def reset(self):
         self.board = None
@@ -195,7 +202,7 @@ def make_computer_move(player_id, session):
 
     move = getComputerMove(board, 'O')
     makeMove(board, 'O', move)
-    drawBoard(board, player_id)
+    drawBoard(board, player_id, session)
     if isWinner(board, 'O'):
         send_text_message(player_id, message_strings.lose_message)
         session.reset()
@@ -232,9 +239,11 @@ def make_player_move(user_id, session, message):
         return False
     else:
         makeMove(board, 'X', move)
-        drawBoard(board, user_id)
+        drawBoard(board, user_id, session)
         if isWinner(board, 'X'):
             send_text_message(user_id, message_strings.win_message)
+            if not session.emoji:
+                propose_emojis(user_id, message_strings.propose_emojis)
             session.reset()
             user = User.query.filter_by(fb_id=user_id).first()
             user.wins += 1
@@ -284,6 +293,13 @@ def start_the_game(user_id, session, message):
         make_computer_move(user_id, session)
 
 
+def turn_emoji(user_id, session, message):
+    if message == Postbacks.ACCEPT_EMOJI:
+        session.emoji = random.choice(emojis)
+    elif message == Postbacks.DECLINE_EMOJI:
+        session.emoji = False
+
+
 def greeting(username):
     text = random.choice(message_strings.greeting_reactions).format(username=username)
     return text_message_sender(text)
@@ -299,7 +315,8 @@ def get_reaction(state, msg_type, username):
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.START: start_the_game,
-            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again))
+            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
+            MsgTypes.EMOJI: turn_emoji
         },
         States.IN_GAME: {
             MsgTypes.GREETING: greeting(username),
@@ -308,6 +325,7 @@ def get_reaction(state, msg_type, username):
             MsgTypes.TURN: make_player_move,
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
             MsgTypes.START: start_the_game,
+            MsgTypes.EMOJI: turn_emoji
         }
     }
     return REACTIONS[state].get(msg_type, text_message_sender(random.choice(message_strings.ask_again)))
@@ -341,7 +359,9 @@ def process_user_input(user_id, message):
 
 
 def identify_postback(payload):
-    return {'PAYLOAD_START_NEW_GAME': MsgTypes.START,
+    return {Postbacks.START_NEW_GAME: MsgTypes.START,
+            Postbacks.ACCEPT_EMOJI: MsgTypes.EMOJI,
+            Postbacks.DECLINE_EMOJI: MsgTypes.EMOJI
             }.get(payload, MsgTypes.UNCLASSIFIED)
 
 
@@ -349,4 +369,4 @@ def process_postback(user_id, payload):
     session = get_session(user_id)
     state = session.state
     msg_type = identify_postback(payload)
-    get_reaction(state, msg_type, session.name)(user_id=user_id, session=session, message=None)
+    get_reaction(state, msg_type, session.name)(user_id=user_id, session=session, message=payload)

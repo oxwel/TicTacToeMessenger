@@ -59,3 +59,5 @@ lang_confirmation = 'Язык изменен'
 good_start = 'Гуд start!'
 
 one_left = 'Онли one move left. Come on!'
+
+propose_emojis = "Ду ю want to play with strawberries and bananas?"
