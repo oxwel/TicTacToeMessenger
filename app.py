@@ -3,6 +3,8 @@ import logging
 
 import sys
 
+from psycopg2._psycopg import InternalError
+
 from flask import Flask, request, send_from_directory, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -77,8 +79,10 @@ def webhook():
                     pass
         except ProgrammingError:
             db.create_all()
+        except InternalError:
+            db.session.rollback()
         except Exception, e:
-            app.logger.error(e.message)
+            print e
         return "failure"
 
 
