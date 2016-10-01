@@ -59,5 +59,6 @@ class Postbacks(Choise):
     START_NEW_GAME = 'PAYLOAD_START_NEW_GAME'
 
 
+emoji_blank = emoji.emojize(':white_medium_square:')
 emojis = [(emoji.emojize(':strawberry:'), emoji.emojize(':banana:')),
           ()]

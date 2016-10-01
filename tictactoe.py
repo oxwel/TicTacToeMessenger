@@ -12,7 +12,7 @@ from flask import current_app as app
 from models import User
 from reactions import text_message_sender, send_text_message, multiple_messages_sender, start_btn, \
     MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji
-from static import States, MsgTypes, Langs, Postbacks, emojis
+from static import States, MsgTypes, Langs, Postbacks, emojis, emoji_blank
 from requests.exceptions import ConnectionError
 
 player_sessions = {}
@@ -34,6 +34,7 @@ def drawBoard(board, player_id, session):
     if emoji:
         message = message.replace('X', emoji[0])
         message = message.replace('O', emoji[1])
+        message = message.replace('_', emoji_blank)
 
     send_text_message(player_id, message)
 
