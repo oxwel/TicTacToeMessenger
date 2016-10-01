@@ -42,6 +42,8 @@ class Langs(Choise):
 
     @classmethod
     def read_locale(cls, locale, default):
+        if not locale:
+            return default
         for alias, lang in cls.choices():
             if lang in locale.upper():
                 return lang

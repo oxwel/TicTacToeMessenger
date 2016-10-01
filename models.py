@@ -2,7 +2,7 @@ from app import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    fb_id = db.Column(db.Integer, unique=True)
+    fb_id = db.Column(db.String, unique=True)
     wins = db.Column(db.Integer, default=0)
     losses = db.Column(db.Integer, default=0)
     ties = db.Column(db.Integer, default=0)

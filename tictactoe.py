@@ -13,6 +13,7 @@ from models import User
 from reactions import text_message_sender, send_text_message, multiple_messages_sender, start_btn, \
     MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji
 from static import States, MsgTypes, Langs, Postbacks, emojis
+from requests.exceptions import ConnectionError
 
 player_sessions = {}
 message_strings = None
@@ -140,9 +141,11 @@ def get_user_profile(player_id):
     payload = {'fields': 'first_name,locale',
                'access_token': os.environ['PAGE_ACCESS_TOKEN']}
     url = "https://graph.facebook.com/v2.6/{user_id:s}".format(user_id=player_id)
-    resp = requests.get(url, params=payload)
-    return resp.json()
-
+    try:
+        resp = requests.get(url, params=payload)
+        return resp.json()
+    except ConnectionError:
+        return {}
 
 class Session(object):
     def __init__(self, user_id):
@@ -152,8 +155,8 @@ class Session(object):
 
         profile = get_user_profile(user_id)
 
-        self.name = profile['first_name']
-        self.lang = Langs.read_locale(profile['locale'], Langs.EN)
+        self.name = profile.get('first_name')
+        self.lang = Langs.read_locale(profile.get('locale'), Langs.EN)
         self.emoji = False
 
     def reset(self):
@@ -244,7 +247,7 @@ def make_player_move(user_id, session, message):
         if isWinner(board, 'X'):
             send_text_message(user_id, message_strings.win_message)
             if not session.emoji:
-                propose_emojis(user_id, message_strings.propose_emojis)
+                propose_emojis(user_id)
             session.reset()
             user = User.query.filter_by(fb_id=user_id).first()
             user.wins += 1
@@ -277,14 +280,11 @@ def new_board():
 
 
 def start_the_game(user_id, session, message):
-    try:
-        user = User.query.filter_by(fb_id=user_id).first()
-        if user is None:
-            user = User(fb_id=user_id)
-        user.games += 1
-        db.session.add(user)
-    except Exception as e:
-        app.logger.error(e)
+    user = User.query.filter_by(fb_id=user_id).first()
+    if user is None:
+        user = User(fb_id=user_id)
+    user.games += 1
+    db.session.add(user)
 
     session.state = States.IN_GAME
     session.board = new_board()
@@ -323,8 +323,8 @@ def _continue(**kwargs):
     pass
 
 
-def propose_emojis(user_id, text):
-    MsgWithButtons([accept_emoji, decline_emoji], message_strings.propose_emojis)
+def propose_emojis(user_id):
+    MsgWithButtons([accept_emoji, decline_emoji], message_strings.propose_emojis).send(user_id)
 
 
 def get_reaction(state, msg_type, username):
