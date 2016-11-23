@@ -398,5 +398,6 @@ def identify_postback(payload):
 def process_postback(user_id, payload):
     session = get_session(user_id)
     state = session.state
+    set_lang(session.lang)
     msg_type = identify_postback(payload)
     get_reaction(state, msg_type, session.name)(user_id=user_id, session=session, message=payload)
