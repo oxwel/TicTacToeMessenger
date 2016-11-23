@@ -20,6 +20,7 @@ class MsgTypes():
     START = 'START'
     TURN = 'TURN'
     ASK_HUMAN = 'ASK_HUMAN'
+    STATS = 'STATS'
 
 
 class Choise:
@@ -57,6 +58,7 @@ class Postbacks(Choise):
     ACCEPT_EMOJI = 'ACCEPT_EMOJI'
     DECLINE_EMOJI = 'DECLINE_EMOJI'
     START_NEW_GAME = 'PAYLOAD_START_NEW_GAME'
+    SHOW_STATS = 'PAYLOAD_STATISTICS'
 
 
 emoji_blank = emoji.emojize(':white_medium_square:')

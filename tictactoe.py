@@ -328,6 +328,15 @@ def propose_emojis(user_id):
     MsgWithButtons([accept_emoji, decline_emoji], message_strings.propose_emojis).send(user_id)
 
 
+def show_stats(user_id, **kwargs):
+    user = User.query.filter_by(fb_id=user_id).first()
+    msg = message_strings.stats.format(total=user.games,
+                                       wins=user.wins,
+                                       losses=user.losses,
+                                       ties=user.ties)
+    send_text_message(user_id, msg)
+
+
 def get_reaction(state, msg_type, username):
     """
     :rtype: function
@@ -342,7 +351,8 @@ def get_reaction(state, msg_type, username):
             MsgTypes.EMOJI: turn_emoji,
             MsgTypes.ASK_HUMAN: ask_human,
             MsgTypes.CALL_HUMAN: call_human,
-            MsgTypes.CONTINUE: _continue
+            MsgTypes.CONTINUE: _continue,
+            MsgTypes.STATS: show_stats,
         },
         States.IN_GAME: {
             MsgTypes.GREETING: greeting(username),
@@ -352,7 +362,8 @@ def get_reaction(state, msg_type, username):
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
             MsgTypes.START: start_the_game,
             MsgTypes.EMOJI: turn_emoji,
-            MsgTypes.ASK_HUMAN: ask_human
+            MsgTypes.ASK_HUMAN: ask_human,
+            MsgTypes.STATS: show_stats,
         }
     }
     return REACTIONS[state].get(msg_type, text_message_sender(random.choice(message_strings.ask_again)))
@@ -391,7 +402,8 @@ def identify_postback(payload):
             Postbacks.ACCEPT_EMOJI: MsgTypes.EMOJI,
             Postbacks.DECLINE_EMOJI: MsgTypes.EMOJI,
             Postbacks.ASK_HUMAN: MsgTypes.CALL_HUMAN,
-            Postbacks.DECLINE_HUMAN: MsgTypes.CONTINUE
+            Postbacks.DECLINE_HUMAN: MsgTypes.CONTINUE,
+            Postbacks.SHOW_STATS: MsgTypes.STATS
             }.get(payload, MsgTypes.UNCLASSIFIED)
 
 

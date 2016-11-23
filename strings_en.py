@@ -73,3 +73,5 @@ human_requests = ['human',
 
 prompt_human_request = "Would you like to talk to a human being?"
 confirm_human = 'The operator will join the conversation soon. Please write your question'
+
+stats = 'Games total: {total}\nWins: {wins}\nTies: {ties}\nLosses: {losses}'
