@@ -11,7 +11,7 @@ from app import db
 from flask import current_app as app
 from models import User
 from reactions import text_message_sender, send_text_message, multiple_messages_sender, start_btn, \
-    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji
+    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji, cancel, confirm
 from static import States, MsgTypes, Langs, Postbacks, emojis, emoji_blank
 from requests.exceptions import ConnectionError
 
@@ -153,6 +153,8 @@ class Session(object):
         self.board = None
         self.play_first = True
         self.state = States.NEW
+        self.previous_state = None
+        self.callback = None
 
         profile = get_user_profile(user_id)
 
@@ -337,6 +339,30 @@ def show_stats(user_id, **kwargs):
     send_text_message(user_id, msg)
 
 
+def make_sure(action):
+    def with_sure(user_id, session, message):
+        """
+
+        :type session: Session
+        """
+        session.previous_state = session.state
+        session.state = States.PROMPT
+        session.callback = action
+        MsgWithButtons([cancel, confirm], message_strings.are_you_sure).send(user_id)
+    return with_sure
+
+
+def do_cancel(user_id, session, message):
+    session.state = session.previous_state
+    session.callback = None
+
+
+def do_confirm(user_id, session, message):
+    callback = session.callback
+    session.callback = None
+    callback(user_id, session, message)
+
+
 def get_reaction(state, msg_type, username):
     """
     :rtype: function
@@ -360,10 +386,14 @@ def get_reaction(state, msg_type, username):
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.TURN: make_player_move,
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
-            MsgTypes.START: start_the_game,
+            MsgTypes.START: make_sure(start_the_game),
             MsgTypes.EMOJI: turn_emoji,
             MsgTypes.ASK_HUMAN: ask_human,
             MsgTypes.STATS: show_stats,
+        },
+        States.PROMPT: {
+            MsgTypes.CANCEL: do_cancel,
+            MsgTypes.CONFIRM: do_confirm,
         }
     }
     return REACTIONS[state].get(msg_type, text_message_sender(random.choice(message_strings.ask_again)))
@@ -403,7 +433,9 @@ def identify_postback(payload):
             Postbacks.DECLINE_EMOJI: MsgTypes.EMOJI,
             Postbacks.ASK_HUMAN: MsgTypes.CALL_HUMAN,
             Postbacks.DECLINE_HUMAN: MsgTypes.CONTINUE,
-            Postbacks.SHOW_STATS: MsgTypes.STATS
+            Postbacks.SHOW_STATS: MsgTypes.STATS,
+            Postbacks.CONFIRM: MsgTypes.CONFIRM,
+            Postbacks.CANCEL: MsgTypes.CANCEL,
             }.get(payload, MsgTypes.UNCLASSIFIED)
 
 

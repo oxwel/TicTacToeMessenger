@@ -3,12 +3,15 @@ import emoji
 
 
 class States():
+    PROMPT = 'PROMPT'
     IN_GAME = 'IN_GAME'
     NEW = 'NEW'
     EXISTING = 'EXISTING'
 
 
 class MsgTypes():
+    CANCEL = 'CANCEL'
+    CONFIRM = 'CONFIRM'
     CONTINUE = 'CONTINUE'
     CALL_HUMAN = 'CALL_HUMAN'
     EMOJI = 'EMOJI'
@@ -53,6 +56,8 @@ class Langs(Choise):
 
 
 class Postbacks(Choise):
+    CONFIRM = 'CONFIRM'
+    CANCEL = 'CANCEL'
     DECLINE_HUMAN = 'DECLINE_HUMAN'
     ASK_HUMAN = 'ASK_HUMAN'
     ACCEPT_EMOJI = 'ACCEPT_EMOJI'
