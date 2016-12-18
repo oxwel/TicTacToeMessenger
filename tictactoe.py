@@ -441,6 +441,7 @@ def identify_postback(payload):
             Postbacks.SHOW_STATS: MsgTypes.STATS,
             Postbacks.CONFIRM: MsgTypes.CONFIRM,
             Postbacks.CANCEL: MsgTypes.CANCEL,
+            Postbacks.RULES: MsgTypes.RULES,
             }.get(payload, MsgTypes.UNCLASSIFIED)
 
 

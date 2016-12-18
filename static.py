@@ -56,6 +56,7 @@ class Langs(Choise):
 
 
 class Postbacks(Choise):
+    RULES = 'RULES'
     CONFIRM = 'CONFIRM'
     CANCEL = 'CANCEL'
     DECLINE_HUMAN = 'DECLINE_HUMAN'
