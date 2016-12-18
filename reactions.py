@@ -60,8 +60,8 @@ decline_emoji = PostbackButton('Cancel', Postbacks.DECLINE_EMOJI)
 start_btn = PostbackButton('Start', Postbacks.START_NEW_GAME)
 confirm_ask_human = PostbackButton('OK', Postbacks.ASK_HUMAN)
 decline_ask_human = PostbackButton('Cancel', Postbacks.DECLINE_HUMAN)
-cancel = PostbackButton('Cancel', Postbacks.CANCEL)
-confirm = PostbackButton('Confirm', Postbacks.CONFIRM)
+cancel = lambda caption: PostbackButton(caption, Postbacks.CANCEL)
+confirm = lambda caption: PostbackButton(caption, Postbacks.CONFIRM)
 
 class MsgWithButtons(object):
     def __init__(self, buttons, text=None):

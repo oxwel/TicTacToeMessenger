@@ -339,7 +339,12 @@ def show_stats(user_id, **kwargs):
     send_text_message(user_id, msg)
 
 
-def make_sure(action):
+def make_sure(action, msg_type):
+    # msg_type: (prompt msg, cancel title, confirm title)
+    MSGS = {
+        MsgTypes.START: message_strings.prompt_for_new_game,
+    }
+    prompt_msg, cancel_title, confirm_title = MSGS.get(msg_type, message_strings.basic_prompt)
     def with_sure(user_id, session, message):
         """
 
@@ -348,7 +353,7 @@ def make_sure(action):
         session.previous_state = session.state
         session.state = States.PROMPT
         session.callback = action
-        MsgWithButtons([cancel, confirm], message_strings.are_you_sure).send(user_id)
+        MsgWithButtons([cancel(cancel_title), confirm(confirm_title)], prompt_msg).send(user_id)
     return with_sure
 
 
@@ -386,7 +391,7 @@ def get_reaction(state, msg_type, username):
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.TURN: make_player_move,
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
-            MsgTypes.START: make_sure(start_the_game),
+            MsgTypes.START: make_sure(start_the_game, msg_type),
             MsgTypes.EMOJI: turn_emoji,
             MsgTypes.ASK_HUMAN: ask_human,
             MsgTypes.STATS: show_stats,

@@ -76,4 +76,6 @@ confirm_human = 'The operator will join the conversation soon. Please write your
 
 stats = 'Games total: {total}\nWins: {wins}\nTies: {ties}\nLosses: {losses}'
 
-are_you_sure = 'Are you sure?'
+# (prompt msg, cancel title, confirm title)
+prompt_for_new_game = ('Are you sure you want to start a new game?', 'Resume game', 'New game')
+basic_prompt = ('Are you sure?', 'Cancel', 'Confirm')
