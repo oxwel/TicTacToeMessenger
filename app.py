@@ -16,7 +16,7 @@ app.config.from_pyfile('config.py')
 app.config.from_pyfile('phrases_config.py')
 app.config['SECRET_KEY'] = 'top-secret!'
 app.config['LOGFILE'] = 'application.log'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/tictactoebot'#os.getenv('DATABASE_URL')#
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
 
 db = SQLAlchemy(app)

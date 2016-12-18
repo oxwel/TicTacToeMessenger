@@ -12,7 +12,7 @@ def call_send_api(message_data):
                       data=message_data,
                       params={'access_token': os.environ['PAGE_ACCESS_TOKEN']},
                       headers={'Content-Type': 'application/json'})
-    app.logger.info('response: {}'.format(r.content))
+    app.logger.info('fb api response: {}'.format(r.content))
 
 
 def send_text_message(recipient_id, text):
