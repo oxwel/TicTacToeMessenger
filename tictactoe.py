@@ -11,7 +11,7 @@ from app import db
 from flask import current_app as app
 from models import User
 from reactions import text_message_sender, send_text_message, multiple_messages_sender, start_btn, \
-    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji, cancel, confirm
+    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji, cancel, confirm, stats_btn
 from static import States, MsgTypes, Langs, Postbacks, emojis, emoji_blank
 from requests.exceptions import ConnectionError
 
@@ -211,13 +211,15 @@ def make_computer_move(player_id, session):
     makeMove(board, 'O', move)
     drawBoard(board, player_id, session)
     if isWinner(board, 'O'):
-        send_text_message(player_id, message_strings.lose_message)
+        MsgWithButtons([start_btn, stats_btn], message_strings.lose_message).send(player_id)
+        # send_text_message(player_id, message_strings.lose_message)
         session.reset()
         user = User.query.filter_by(fb_id=player_id).first()
         user.losses += 1
         db.session.add(user)
     elif isBoardFull(board):
-        send_text_message(player_id, message_strings.tie_message)
+        MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(player_id)
+        # send_text_message(player_id, message_strings.tie_message)
         session.reset()
         user = User.query.filter_by(fb_id=player_id).first()
         user.ties += 1
@@ -248,7 +250,8 @@ def make_player_move(user_id, session, message):
         makeMove(board, 'X', move)
         drawBoard(board, user_id, session)
         if isWinner(board, 'X'):
-            send_text_message(user_id, message_strings.win_message)
+            MsgWithButtons([start_btn, stats_btn], message_strings.win_message).send(user_id)
+            # send_text_message(user_id, message_strings.win_message)
             if not session.emoji:
                 propose_emojis(user_id)
             session.reset()
@@ -257,7 +260,8 @@ def make_player_move(user_id, session, message):
             db.session.add(user)
             return False
         elif isBoardFull(board):
-            send_text_message(user_id, message_strings.tie_message)
+            MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(user_id)
+            # send_text_message(user_id, message_strings.tie_message)
             session.reset()
             user = User.query.filter_by(fb_id=user_id).first()
             user.ties += 1

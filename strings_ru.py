@@ -29,11 +29,11 @@ space_occupied = "Эта клетка занята. Введи другое чи
 
 rule_string = 'RULES'
 
-win_message = 'Ура!!! Ты выиграл! Напиши PLAY, чтобы сыграть еще раз'
+win_message = 'Ура!!! Ты выиграл!'
 
-lose_message = 'Ой, ты проиграл. Напиши PLAY, чтобы сыграть еще раз'
+lose_message = 'Ой, ты проиграл.'
 
-tie_message = 'Победила дружба! Напиши PLAY, чтобы сыграть еще раз'
+tie_message = 'Победила дружба!'
 
 expected_greetings = ['hi', 'hello']
 language = ['language', 'ru', 'en']

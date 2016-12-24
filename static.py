@@ -69,4 +69,4 @@ class Postbacks(Choise):
 
 emoji_blank = emoji.emojize(':white_medium_square:')
 emojis = [(emoji.emojize(':strawberry:'), emoji.emojize(':banana:')),
-          ()]
+          ]
