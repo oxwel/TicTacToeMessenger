@@ -10,6 +10,7 @@ class States():
 
 
 class MsgTypes():
+    LANG_REQUEST = 'LANG_REQ'
     CANCEL = 'CANCEL'
     CONFIRM = 'CONFIRM'
     CONTINUE = 'CONTINUE'
@@ -43,6 +44,7 @@ class Choise:
 class Langs(Choise):
     EN = 'EN'
     RU = 'RU'
+    UA = 'UA'
 
     @classmethod
     def read_locale(cls, locale, default):
@@ -56,6 +58,14 @@ class Langs(Choise):
 
 
 class Postbacks(Choise):
+    EN = 'EN'
+    RU = 'RU'
+    UA = 'UA'
+    LANGS = {'EN': 'English',
+             'RU': 'Russian',
+             'UA': 'Ukrainian'}
+    LANG = 'LANG'
+    CHAT = 'CHAT'
     RULES = 'RULES'
     CONFIRM = 'CONFIRM'
     CANCEL = 'CANCEL'

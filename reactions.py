@@ -43,6 +43,15 @@ def multiple_messages_sender(*messages):
     return f
 
 
+def with_buttons(msg_sender, buttons, text):
+    def f(*args, **kwargs):
+        def foo(user_id, *ag, **kw):
+            msg_sender(*args, **kwargs)(user_id, *ag, **kw)
+            MsgWithButtons(buttons, text).send(user_id)
+        return foo
+    return f
+
+
 class PostbackButton(object):
     def __init__(self, title, payload):
         self.title = title
@@ -63,9 +72,12 @@ decline_ask_human = PostbackButton('Cancel', Postbacks.DECLINE_HUMAN)
 cancel = lambda caption: PostbackButton(caption, Postbacks.CANCEL)
 confirm = lambda caption: PostbackButton(caption, Postbacks.CONFIRM)
 stats_btn = PostbackButton('Statistics', Postbacks.SHOW_STATS)
+rules_btn = PostbackButton('Rules', Postbacks.RULES)
+lang_buttons = [PostbackButton(lang, postback) for postback, lang in Postbacks.LANGS.items() ]
+
 
 class MsgWithButtons(object):
-    def __init__(self, buttons, text=None):
+    def __init__(self, buttons, text=''):
         self.text = text
         self.buttons = buttons
 
@@ -87,3 +99,9 @@ class MsgWithButtons(object):
         return call_send_api(msg_data)
 
 
+ADMIN_ID = os.getenv('ADMIN_ID')
+
+
+def send_notification(user_profile):
+    send_text_message(ADMIN_ID, 'User %s %s wants to chat' % (user_profile.get('first_name'),
+                                                              user_profile.get('last_name')))

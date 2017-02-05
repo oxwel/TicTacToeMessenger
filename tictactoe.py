@@ -11,7 +11,8 @@ from app import db
 from flask import current_app as app
 from models import User
 from reactions import text_message_sender, send_text_message, multiple_messages_sender, start_btn, \
-    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji, cancel, confirm, stats_btn
+    MsgWithButtons, confirm_ask_human, decline_ask_human, accept_emoji, decline_emoji, cancel, confirm, stats_btn, \
+    with_buttons, rules_btn, send_notification, lang_buttons
 from static import States, MsgTypes, Langs, Postbacks, emojis, emoji_blank
 from requests.exceptions import ConnectionError
 
@@ -139,7 +140,7 @@ def isBoardEmpty(board):
 
 
 def get_user_profile(player_id):
-    payload = {'fields': 'first_name,locale',
+    payload = {'fields': 'first_name,locale,last_name',
                'access_token': os.environ['PAGE_ACCESS_TOKEN']}
     url = "https://graph.facebook.com/v2.6/{user_id:s}".format(user_id=player_id)
     try:
@@ -147,6 +148,7 @@ def get_user_profile(player_id):
         return resp.json()
     except ConnectionError:
         return {}
+
 
 class Session(object):
     def __init__(self, user_id):
@@ -161,6 +163,8 @@ class Session(object):
         self.name = profile.get('first_name')
         self.lang = Langs.read_locale(profile.get('locale'), Langs.EN)
         self.emoji = False
+        self.profile = profile
+        self.user_id = user_id
 
     def reset(self):
         self.board = None
@@ -191,6 +195,8 @@ def send_language_option(player_id, send_message):
 def set_lang(message, **kw):
     if message and Langs.RU in message.upper():
         import strings_ru as message_strings_local
+    elif message and Langs.UA in message.upper():
+        import strings_ua as message_strings_local
     else:
         import strings_en as message_strings_local
     global message_strings
@@ -251,7 +257,6 @@ def make_player_move(user_id, session, message):
         drawBoard(board, user_id, session)
         if isWinner(board, 'X'):
             MsgWithButtons([start_btn, stats_btn], message_strings.win_message).send(user_id)
-            # send_text_message(user_id, message_strings.win_message)
             if not session.emoji:
                 propose_emojis(user_id)
             session.reset()
@@ -261,7 +266,6 @@ def make_player_move(user_id, session, message):
             return False
         elif isBoardFull(board):
             MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(user_id)
-            # send_text_message(user_id, message_strings.tie_message)
             session.reset()
             user = User.query.filter_by(fb_id=user_id).first()
             user.ties += 1
@@ -323,6 +327,7 @@ def ask_human(user_id, session, message):
 
 
 def call_human(user_id, session, message):
+    send_notification(session.profile)
     send_text_message(user_id, message_strings.confirm_human)
 
 
@@ -340,7 +345,7 @@ def show_stats(user_id, **kwargs):
                                        wins=user.wins,
                                        losses=user.losses,
                                        ties=user.ties)
-    send_text_message(user_id, msg)
+    MsgWithButtons([start_btn, rules_btn], msg).send(user_id)
 
 
 def make_sure(action, msg_type):
@@ -380,7 +385,7 @@ def get_reaction(state, msg_type, username):
         States.NEW: {
             MsgTypes.GREETING: greeting_new,
             MsgTypes.LANGUAGE: change_lang,
-            MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
+            MsgTypes.RULES: with_buttons(text_message_sender, [start_btn], message_strings.rules_part2)(message_strings.rules_part1),
             MsgTypes.START: start_the_game,
             MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
             MsgTypes.EMOJI: turn_emoji,
@@ -388,13 +393,14 @@ def get_reaction(state, msg_type, username):
             MsgTypes.CALL_HUMAN: call_human,
             MsgTypes.CONTINUE: _continue,
             MsgTypes.STATS: show_stats,
+            MsgTypes.LANG_REQUEST: lambda user_id, **kw: MsgWithButtons(lang_buttons, 'Choose language:').send(user_id)
         },
         States.IN_GAME: {
             MsgTypes.GREETING: greeting(username),
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
             MsgTypes.TURN: make_player_move,
-            MsgTypes.UNCLASSIFIED: text_message_sender(random.choice(message_strings.ask_again)),
+            MsgTypes.UNCLASSIFIED: text_message_sender(message_strings.rules_part2),
             MsgTypes.START: make_sure(start_the_game, msg_type),
             MsgTypes.EMOJI: turn_emoji,
             MsgTypes.ASK_HUMAN: ask_human,
@@ -446,6 +452,11 @@ def identify_postback(payload):
             Postbacks.CONFIRM: MsgTypes.CONFIRM,
             Postbacks.CANCEL: MsgTypes.CANCEL,
             Postbacks.RULES: MsgTypes.RULES,
+            Postbacks.CHAT: MsgTypes.CALL_HUMAN,
+            Postbacks.LANG: MsgTypes.LANG_REQUEST,
+            Postbacks.EN: MsgTypes.LANGUAGE,
+            Postbacks.RU: MsgTypes.LANGUAGE,
+            Postbacks.UA: MsgTypes.LANGUAGE,
             }.get(payload, MsgTypes.UNCLASSIFIED)
 
 

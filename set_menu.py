@@ -41,6 +41,8 @@ if __name__ == '__main__':
     print set_menu([
         postback_item('Start new game', Postbacks.START_NEW_GAME),
         postback_item('Show stats', Postbacks.SHOW_STATS),
-        postback_item('Show rules', Postbacks.RULES)
+        postback_item('Show rules', Postbacks.RULES),
+        postback_item('Chat', Postbacks.CHAT),
+        postback_item('Language', Postbacks.LANG)
     ],
     access_token).content
