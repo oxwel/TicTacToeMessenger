@@ -10,6 +10,7 @@ class States():
 
 
 class MsgTypes():
+    MY_ID = 'MY_ID'
     LANG_REQUEST = 'LANG_REQ'
     CANCEL = 'CANCEL'
     CONFIRM = 'CONFIRM'

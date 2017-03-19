@@ -316,6 +316,8 @@ def greeting(username):
     text = random.choice(message_strings.greeting_reactions).format(username=username)
     return text_message_sender(text)
 
+def send_id(user_id, session, message):
+    send_text_message(user_id, str(user_id))
 
 def greeting_new(user_id, session, message):
     text = random.choice(message_strings.greeting_reactions).format(username=session.name)
@@ -383,6 +385,7 @@ def get_reaction(state, msg_type, username):
     """
     REACTIONS = {
         States.NEW: {
+            MsgTypes.MY_ID: send_id,
             MsgTypes.GREETING: greeting_new,
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: with_buttons(text_message_sender, [start_btn], message_strings.rules_part2)(message_strings.rules_part1),
@@ -396,6 +399,7 @@ def get_reaction(state, msg_type, username):
             MsgTypes.LANG_REQUEST: lambda user_id, **kw: MsgWithButtons(lang_buttons, 'Choose language:').send(user_id)
         },
         States.IN_GAME: {
+            MsgTypes.MY_ID: send_id,
             MsgTypes.GREETING: greeting(username),
             MsgTypes.LANGUAGE: change_lang,
             MsgTypes.RULES: multiple_messages_sender(message_strings.rules_part1, message_strings.rules_part2),
@@ -407,6 +411,7 @@ def get_reaction(state, msg_type, username):
             MsgTypes.STATS: show_stats,
         },
         States.PROMPT: {
+            MsgTypes.MY_ID: send_id,
             MsgTypes.CANCEL: do_cancel,
             MsgTypes.CONFIRM: do_confirm,
         }
@@ -425,7 +430,8 @@ def classify_msg(message):
         MsgTypes.RULES: message_strings.rules_request,
         MsgTypes.START: message_strings.start,
         MsgTypes.TURN: message_strings.turn,
-        MsgTypes.ASK_HUMAN: message_strings.human_requests
+        MsgTypes.ASK_HUMAN: message_strings.human_requests,
+        MsgTypes.MY_ID: message_strings.id_request
     }
     for msg_type, clues in clues.items():
         if any([re.search(pattern(s), message, re.UNICODE) for s in clues]):

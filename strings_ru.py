@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 rules_part1 = '''
-Два игрока ходят по очереди, заполняя свободные клетки поля размером 3х3 крестиками (Х) и ноликами (О). Игрок, которому удастся выстроить в ряд 3 своих фигуры по вертикали, горизонтали или диагонали, выигрывает.
+Играть очень просто! Два игрока ходят по очереди, заполняя свободные клетки поля размером 3х3 крестиками (Х) и ноликами (О). Игрок, которому удастся выстроить в ряд 3 своих фигуры по вертикали, горизонтали или диагонали, выигрывает.
 _ | _ | _
 _ | _ | _
 _ | _ | _
@@ -12,7 +12,7 @@ rules_part2 = '''У каждой клетки свой номер:
 1 | 2 | 3
 4 | 5 | 6
 7 | 8 | 9
-Чтобы сделать ход, просто введи число!
+Чтобы сделать ход, просто введи число. Вперед!
 '''
 
 rules_option = '''
@@ -29,26 +29,27 @@ space_occupied = "Эта клетка занята. Введи другое чи
 
 rule_string = 'RULES'
 
-win_message = 'Ура!!! Ты выиграл!'
+win_message = 'Ура!!! Победа твоя!'
 
-lose_message = 'Ой, ты проиграл.'
+lose_message = 'Ой, тебе не повезло на этот раз'
 
 tie_message = 'Победила дружба!'
 
-expected_greetings = ['hi', 'hello']
+expected_greetings = ['привет', 'прив', 'добрый день', 'доброе утро', 'добрый вечер', 'здравствуй', 'здравствуйте',
+                      'хай', 'хей', 'хелло', 'йоу']
 language = ['language', 'ru', 'en']
 rules_request = ['rules', 'help']
 start = ['play', 'start']
 turn = ['\d']
 
 greeting_reaction = 'greeting reaction ru'
-greeting_reactions = ['Hi, {username}',
-                      'Howdy',
-                      'Oh, hello',
-                      'Wassup!',
-                      '{username}, glad to see you again!',
-                      'Hi there',
-                      'Thanks for stopping by, {username}!'
+greeting_reactions = ['Привет, {username}',
+                      'Приветы!',
+                      'Бонжур',
+                      'Привет-привет!',
+                      'Хей, {username}, рад тебя снова видеть!',
+                      'Йоу, {username}',
+                      'Классно, что помнишь про меня!'
                       ]
 late_greeting_reaction = 'late greeting reaction ru'
 
@@ -56,22 +57,31 @@ ask_again = ['Не понимаю']
 
 lang_confirmation = 'Язык изменен'
 
-good_start = 'Гуд start!'
+good_start = 'Отличное начало!'
 
-one_left = 'Онли one move left. Come on!'
+one_left = 'Давай же, остался всего один ход!'
 
-propose_emojis = "Ду ю want to play with strawberries and bananas?"
+propose_emojis = "Как насчет того, чтобы поиграть с клубничкой?:)"
 
-human_requests = ['Human',
-                  'Chat',
-                  'Talk',
-                  'Order',
-                  'Shop']
+human_requests = ['купит',
+                  'поддержк',
+                  'говорит',
+                  'общаться',
+                  'оператор',
+                  'менеджер',
+                  'заказ',
+                  'телефон',
+                  'замовлення',
+                  'магазин']
 
-prompt_human_request = "Would you лайк to talk to a human being?"
-confirm_human = 'The оператор will join the conversation soon. Please write your question'
+prompt_human_request = "Вы хотите связаться с менеджером магазина GameClub?"
+confirm_human = 'Я сейчас позову кого-то, кто сможет с вами поговорить. А пока напишите, что именно вы хотите уточнить'
 
-stats = 'Games total: {total}\nWins: {wins}\nTies: {ties}\nLosses: {losses}'
+stats = 'Всего игр: {total}\nПобеды: {wins}\nНичьи: {ties}\nПоражения: {losses}'
 
-prompt_for_new_game = ('Are you sure you want to start a new game?', 'Resume game', 'New game')
-basic_prompt = ('Are you sure?', 'Cancel', 'Confirm')
+prompt_for_new_game = (
+'Перед тем, как начать новую игру, я хочу убедиться, что ты находишься в трезвом уме и твердой памяти. Точно хочешь начать новую игру?',
+'Вернуться к игре', 'Новая игра')
+basic_prompt = ('Точно?', 'Отмена', 'Да')
+
+id_request = ['SHOW MY ID PLEASE']

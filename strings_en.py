@@ -79,3 +79,5 @@ stats = 'Games total: {total}\nWins: {wins}\nTies: {ties}\nLosses: {losses}'
 # (prompt msg, cancel title, confirm title)
 prompt_for_new_game = ('Are you sure you want to start a new game?', 'Resume game', 'New game')
 basic_prompt = ('Are you sure?', 'Cancel', 'Confirm')
+
+id_request = ['SHOW MY ID PLEASE']
