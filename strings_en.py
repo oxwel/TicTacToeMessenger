@@ -30,11 +30,19 @@ space_occupied = "Sorry, this space is occupied. Try other number"
 
 rule_string = 'RULES'
 
-win_message = 'Hooray! You have won the game! Type PLAY to start again'
+win_message = 'Hooray! You have won the game! Select Play to start again'
 
-lose_message = ['Sorry, you lost. Type PLAY to start again']
+lose_message = ['Sorry, you lost. Select Play to start again',
+                'Not your day. Maybe you\'ll be lucky other time!',
+                'Oh, it seems to me I won. Let\'s play one more',
+                'Keep your pecker up! Let\'s try again',
+                'Well, I\'m a professional. You deserve a medal at least for your courage to play with me;)'
+               ]
 
-tie_message = 'Well, the game is a tie. Type PLAY to start again'
+tie_message = ['Well, the game is a tie. Select Play to start again',
+               'No one likes to loose. And no one looses!',
+               'It\'s a draw. Let\'s play again'
+               ]
 
 expected_greetings = ['hi', 'hello', 'hallo', 'good morning', 'good afternoon', 'good evening', 'wassup']
 language = ['language', 'ru', 'en']
@@ -54,15 +62,35 @@ late_greeting_reaction = 'late greeting reaction'
 
 ask_again = ['I need to ask someone what you mean',
              'Sorry, I don’t get it',
+             'If you want to play, type Play',
+             'Well, maybe you can select what you want in the menu?',
+             'Type Play and we\'ll start!',
              'I should have lost my babel fish, as I don’t understand you',
              'Can you repeat once again?',
-             'Maybe we should find an interpreter? ']
+             'Maybe we should find an interpreter?'
+            ]
 
 lang_confirmation = 'Language changed'
 
-good_start = 'Good start!'
+good_start = ['Good start!',
+              'I\'m not afraid!',
+              'KK, my turn',
+              'Nice!',
+              'Well well',
+              'Frankly speaking, I\'m surprised',
+              'Let me think what I can do',
+              'What do you think about this?'
+              ]
 
-one_left = 'Only one move left. Come on!'
+one_left = ['Only one move left. Come on!',
+            'The last one!',
+            'Do it, just do it',
+            'Are you sure?',
+            'Looking forward to your move!',
+            'I would think twice...',
+            'We\'re almost done, come on!',
+            'I wonder who will be the winner...'
+            ]
 
 propose_emojis = "Do you want to play with strawberries and bananas?"
 
