@@ -410,6 +410,7 @@ def get_reaction(state, msg_type, username):
             MsgTypes.EMOJI: turn_emoji,
             MsgTypes.ASK_HUMAN: ask_human,
             MsgTypes.STATS: show_stats,
+            MsgTypes.LANG_REQUEST: lambda user_id, **kw: MsgWithButtons(lang_buttons, 'Choose language:').send(user_id)
         },
         States.PROMPT: {
             MsgTypes.MY_ID: send_id,
