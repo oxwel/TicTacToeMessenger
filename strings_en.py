@@ -30,7 +30,7 @@ rule_string = 'RULES'
 
 win_message = 'Hooray! You have won the game! Type PLAY to start again'
 
-lose_message = 'Sorry, you lost. Type PLAY to start again'
+lose_message = ['Sorry, you lost. Type PLAY to start again']
 
 tie_message = 'Well, the game is a tie. Type PLAY to start again'
 
