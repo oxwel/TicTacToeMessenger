@@ -2,7 +2,7 @@
 echo $1
 curl -X POST -H "Content-Type: application/json" -d "{
   \"greeting\":[{
-    \"text\": \"Hi {{user_first_name}}. Let\'s play Tic-tac-toe with me. Start new game from the menu - come on!\",
+    \"text\": \"Hi {{user_first_name}}. Let\'s play Tic-tac-toe with me. Start new game from the menu or type PLAY - come on!\",
     \"locale\":\"default\",
   },{
    \"greeting\":[{
