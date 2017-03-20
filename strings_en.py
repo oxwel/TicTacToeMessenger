@@ -1,4 +1,6 @@
 # coding=utf-8
+from __future__ import unicode_literals
+
 rules_part1 = '''
 Two players take turns marking the spaces in a 3x3 grid with X and O. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.
 This is a grid where we shall play.
