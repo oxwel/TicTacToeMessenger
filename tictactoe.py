@@ -149,12 +149,6 @@ def get_user_profile(player_id):
     except ConnectionError:
         return {}
 
-def get_user_model(user_id):
-    user = User.query.filter_by(fb_id=user_id).first()
-    if user is None:
-        user = User(fb_id=user_id)
-    return user
-
 
 class Session(object):
     def __init__(self, user_id):
@@ -171,7 +165,6 @@ class Session(object):
         self.emoji = False
         self.profile = profile
         self.user_id = user_id
-        self.user = get_user_model(user_id)
 
     def reset(self):
         self.board = None
@@ -224,17 +217,19 @@ def make_computer_move(player_id, session):
     makeMove(board, 'O', move)
     drawBoard(board, player_id, session)
     if isWinner(board, 'O'):
-        MsgWithButtons([start_btn, stats_btn], message_strings.lose_message).send(player_id)
+        MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.lose_message)).send(player_id)
         # send_text_message(player_id, message_strings.lose_message)
         session.reset()
-        session.user.losses += 1
-        db.session.add(session.user)
+        user = User.query.filter_by(fb_id=player_id).first()
+        user.losses += 1
+        db.session.add(user)
     elif isBoardFull(board):
         MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(player_id)
         # send_text_message(player_id, message_strings.tie_message)
         session.reset()
-        session.user.ties += 1
-        db.session.add(session.user)
+        user = User.query.filter_by(fb_id=player_id).first()
+        user.ties += 1
+        db.session.add(user)
     elif board.count('_') <= 3:
         send_text_message(player_id, message_strings.one_left)
     session.board = board
@@ -265,14 +260,16 @@ def make_player_move(user_id, session, message):
             if not session.emoji:
                 propose_emojis(user_id)
             session.reset()
-            session.user.wins += 1
-            db.session.add(session.user)
+            user = User.query.filter_by(fb_id=user_id).first()
+            user.wins += 1
+            db.session.add(user)
             return False
         elif isBoardFull(board):
             MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(user_id)
             session.reset()
-            session.user.ties += 1
-            db.session.add(session.user)
+            user = User.query.filter_by(fb_id=user_id).first()
+            user.ties += 1
+            db.session.add(user)
             return False
         else:
             make_computer_move(user_id, session)
@@ -282,7 +279,7 @@ def make_player_move(user_id, session, message):
 def change_lang(user_id, session, message):
     session.lang = Langs.read(message, default=Langs.EN)
     set_lang(session.lang)
-    send_text_message(user_id, message_strings.lang_confirmation)
+    MsgWithButtons([start_btn, stats_btn], message_strings.lang_confirmation).send(user_id)
 
 
 def ask_for_move(user_id):
@@ -294,7 +291,9 @@ def new_board():
 
 
 def start_the_game(user_id, session, message):
-    user = session.user
+    user = User.query.filter_by(fb_id=user_id).first()
+    if user is None:
+        user = User(fb_id=user_id)
     user.games += 1
     db.session.add(user)
 
@@ -342,8 +341,8 @@ def propose_emojis(user_id):
     MsgWithButtons([accept_emoji, decline_emoji], message_strings.propose_emojis).send(user_id)
 
 
-def show_stats(user_id, session, **kwargs):
-    user = session.user
+def show_stats(user_id, **kwargs):
+    user = User.query.filter_by(fb_id=user_id).first()
     msg = message_strings.stats.format(total=user.games,
                                        wins=user.wins,
                                        losses=user.losses,
