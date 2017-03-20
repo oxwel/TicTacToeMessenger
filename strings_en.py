@@ -41,8 +41,8 @@ start = ['play', 'start']
 turn = ['\d']
 
 greeting_reaction = 'greeting reaction'
-greeting_reactions = ['Hi, {username}. Let\'s play!,
-                      'Howdy. I\'m here to play with you,
+greeting_reactions = ['Hi, {username}. Let\'s play!',
+                      'Howdy. I\'m here to play with you',
                       'Oh, hello. Let\'s start!',
                       'Hi there. Wanna play with me?',
                       'Wassup!!! Play with me!',
