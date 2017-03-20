@@ -31,7 +31,7 @@ rule_string = 'RULES'
 
 win_message = 'Ура!!! Перемога твоя!'
 
-lose_message = 'Ой, тобі не пощастило цього разу'
+lose_message = ['Ой, тобі не пощастило цього разу']
 
 tie_message = 'Це була партія кота!'
 
