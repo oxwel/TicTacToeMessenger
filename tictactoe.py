@@ -218,7 +218,7 @@ def make_computer_move(player_id, session):
     board = session.board
 
     if board.count('_') == 9:
-        send_text_message(player_id, message_strings.good_start)
+        send_text_message(player_id, random.choice(message_strings.good_start))
 
     move = getComputerMove(board, 'O')
     makeMove(board, 'O', move)
@@ -230,13 +230,13 @@ def make_computer_move(player_id, session):
         session.user.losses += 1
         db.session.add(session.user)
     elif isBoardFull(board):
-        MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(player_id)
+        MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.tie_message)).send(player_id)
         # send_text_message(player_id, message_strings.tie_message)
         session.reset()
         session.user.ties += 1
         db.session.add(session.user)
     elif board.count('_') <= 3:
-        send_text_message(player_id, message_strings.one_left)
+        send_text_message(player_id, random.choice(message_strings.one_left))
     session.board = board
 
 
@@ -282,7 +282,7 @@ def make_player_move(user_id, session, message):
 def change_lang(user_id, session, message):
     session.lang = Langs.read(message, default=Langs.EN)
     set_lang(session.lang)
-    send_text_message(user_id, message_strings.lang_confirmation)
+    MsgWithButtons([start_btn], message_strings.lang_confirmation).send(user_id)
 
 
 def ask_for_move(user_id):
