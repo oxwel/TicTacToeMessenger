@@ -224,7 +224,7 @@ def make_computer_move(player_id, session):
     makeMove(board, 'O', move)
     drawBoard(board, player_id, session)
     if isWinner(board, 'O'):
-        MsgWithButtons([start_btn, stats_btn], message_strings.lose_message).send(player_id)
+        MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.lose_message)).send(player_id)
         # send_text_message(player_id, message_strings.lose_message)
         session.reset()
         session.user.losses += 1
