@@ -269,7 +269,7 @@ def make_player_move(user_id, session, message):
             db.session.add(session.user)
             return False
         elif isBoardFull(board):
-            MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(user_id)
+            MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.tie_message)).send(user_id)
             session.reset()
             session.user.ties += 1
             db.session.add(session.user)
