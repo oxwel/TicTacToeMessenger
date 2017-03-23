@@ -98,7 +98,34 @@ class MsgWithButtons(object):
                                "message": self.dict()})
         return call_send_api(msg_data)
 
+class MsgWithImages(object):
+    def __init__(self, buttons, title='', subtitle='', imageurl=''):
+        self.title = title
+        self.subtitle = subtitle
+        self.imageurl = imageurl
+        self.buttons = buttons
 
+    def dict(self):
+        return {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": [{
+                        "title": self.title,
+                        "subtitle": self.subtitle,          
+                        "image_url": self.imageurl,
+                        "buttons": [button.dict() for button in self.buttons]
+                    }]
+                }
+            }
+        }
+
+    def send(self, recipient_id):
+        msg_data = json.dumps({"recipient": {"id": recipient_id},
+                               "message": self.dict()})
+        return call_send_api(msg_data)
+    
 ADMIN_ID = os.getenv('ADMIN_ID')
 
 

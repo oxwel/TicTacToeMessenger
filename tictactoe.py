@@ -224,7 +224,8 @@ def make_computer_move(player_id, session):
     makeMove(board, 'O', move)
     drawBoard(board, player_id, session)
     if isWinner(board, 'O'):
-        MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.lose_message)).send(player_id)
+        MsgWithImages([start_btn, stats_btn], "Now you should not cry!", random.choice(message_strings.lose_message), "https://media.giphy.com/media/o88b7sigrFmQE/giphy.gif").send(player_id)
+        # MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.lose_message)).send(player_id)
         # send_text_message(player_id, message_strings.lose_message)
         session.reset()
         session.user.losses += 1
@@ -261,7 +262,7 @@ def make_player_move(user_id, session, message):
         makeMove(board, 'X', move)
         drawBoard(board, user_id, session)
         if isWinner(board, 'X'):
-            MsgWithButtons([start_btn, stats_btn], message_strings.win_message).send(user_id)
+            MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.win_message)).send(user_id)
             if not session.emoji:
                 propose_emojis(user_id)
             session.reset()
