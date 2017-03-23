@@ -269,7 +269,7 @@ def make_player_move(user_id, session, message):
             db.session.add(session.user)
             return False
         elif isBoardFull(board):
-            MsgWithButtons([start_btn, stats_btn], message_strings.tie_message).send(user_id)
+            MsgWithButtons([start_btn, stats_btn], random.choice(message_strings.tie_message)).send(user_id)
             session.reset()
             session.user.ties += 1
             db.session.add(session.user)
@@ -436,7 +436,7 @@ def classify_msg(message):
         MsgTypes.MY_ID: message_strings.id_request
     }
     for msg_type, clues in clues.items():
-        if any([re.search(pattern(s), message, re.UNICODE) for s in clues]):
+        if any([re.search(pattern(s.lower()), message.lower(), re.UNICODE) for s in clues]):
             return msg_type
     else:
         return MsgTypes.UNCLASSIFIED
